@@ -1,6 +1,6 @@
 """
 Agente news cardiologiche: PubMed -> Groq Llama3 (Gratis) -> Telegram
-Versione 100% gratuita senza scadenze o costi di credito
+Versione diagnostica allineata e protetta dai blocchi
 """
 import os
 import time
@@ -27,11 +27,12 @@ PUBMED_ESEARCH = "https://nih.gov"
 PUBMED_EFETCH = "https://nih.gov"
 
 def search_recent_ids(source_name, identifier):
-    params = {"db": "pubmed", "term": f'"{identifier}"[Journal] AND ("last 3 days"[PDat])', "retmax": 3, "sort": "most recent", "retmode": "json"}
+    params = {"db": "pubmed", "term": f'"{identifier}"[Journal] AND ("last 3 days"[PDat])', "retmax": 2, "sort": "most recent", "retmode": "json"}
     try:
         r = requests.get(PUBMED_ESEARCH, params=params, timeout=20)
         return r.json().get("esearchresult", {}).get("idlist", [])
-    except Exception:
+    except Exception as e:
+        print(f"Errore ricerca PubMed {source_name}: {e}")
         return []
 
 def fetch_articles_xml(pmids):
@@ -40,11 +41,15 @@ def fetch_articles_xml(pmids):
     try:
         resp = requests.get(PUBMED_EFETCH, params=params, timeout=20)
         return ET.fromstring(resp.content)
-    except Exception:
+    except Exception as e:
+        print(f"Errore XML PubMed: {e}")
         return None
 
 def analyze_with_groq(title, abstract, source):
-    """Interroga l'infrastruttura gratuita di Groq utilizzando Llama 3."""
+    if not GROQ_API_KEY:
+        print("[DEBUG ERRORE] Chiave GROQ_API_KEY non rilevata dal sistema!")
+        return "IGNORE"
+
     url = "https://groq.com"
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
@@ -52,22 +57,21 @@ def analyze_with_groq(title, abstract, source):
     }
     
     prompt = f"""
-    Act as an expert cardiologist and critical care specialist. Analyze this scientific entry:
+    Act as an expert cardiologist. Analyze this paper.
     Source: {source}
     Title: {title}
-    Abstract: {abstract[:2000]}
+    Abstract: {abstract[:1500]}
 
-    If this article is NOT a major clinical trial, a new guideline, or a crucial clinical discovery, reply ONLY with the word: IGNORE.
-    
-    If it is clinically relevant, provide a concise summary in ENGLISH formatted exactly as follows:
-    ❤️ **[ARTICLE TITLE IN ENGLISH]**
+    If it's NOT a major clinical trial, guideline, or critical discovery, reply ONLY with: IGNORE.
+    If important, summarize in ENGLISH:
+    ❤️ **[TITLE]**
     🏛️ *Source:* {source}
-    🎯 *Clinical Relevance:* (Max 2 sentences explaining why a practicing physician needs to know this)
-    📝 *Key Findings:* (Summarize main endpoints or results in max 4 short lines)
+    🎯 *Clinical Relevance:* (2 sentences max)
+    📝 *Key Findings:* (max 4 short lines)
     """
     
     data = {
-        "model": "llama3-8b-8192",  # Modello ultra-veloce e gratuito su Groq
+        "model": "llama3-8b-8192",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.1
     }
@@ -76,29 +80,28 @@ def analyze_with_groq(title, abstract, source):
         response = requests.post(url, json=data, headers=headers, timeout=25)
         if response.status_code == 200:
             return response.json()["choices"][0]["message"]["content"].strip()
+        print(f"[DEBUG GROQ HTTP ERROR] Code {response.status_code}: {response.text}")
         return "IGNORE"
-    except Exception:
+    except Exception as e:
+        print(f"Errore chiamata Groq: {e}")
         return "IGNORE"
 
 def send_to_telegram(message, link):
     url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": TELEGRAM_CHAT_ID,
-        "text": f"{message}\n\n🔗 [Link to PubMed]({link})",
-        "parse_mode": "Markdown"
-    }
+    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": f"{message}\n\n🔗 [PubMed]({link})", "parse_mode": "Markdown"}
     try:
         requests.post(url, json=payload, timeout=15)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Errore invio Telegram: {e}")
 
 def main():
-    print("Avvio monitoraggio gratuito con Groq...")
+    print("--- AVVIO AGENTE GENERALE (CONNESSO A GROQ CLOUD) ---")
     
     all_sources = dict(JOURNALS)
     all_sources["Critical Care Reviews"] = "CC_REVIEW_SPECIAL"
 
     for source_name, identifier in all_sources.items():
+        print(f"Analisi canale: {source_name}")
         ids = search_recent_ids(source_name, identifier)
         root = fetch_articles_xml(ids)
         if root is None: continue
@@ -115,10 +118,10 @@ def main():
 
             if "IGNORE" not in analysis:
                 send_to_telegram(analysis, f"https://nih.gov{pmid}/")
-                print(f"Notifica inviata per: {title}")
+                print(f"Notifica inviata con successo su Telegram per: {title}")
 
         time.sleep(1)
-    print("Monitoraggio completato.")
+    print("--- FINE MONITORAGGIO ---")
 
 if __name__ == "__main__":
     main()
