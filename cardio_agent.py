@@ -28,7 +28,7 @@ PUBMED_EFETCH = "https://nih.gov"
 
 def search_recent_ids(source_name, identifier):
     # Monitoraggio degli ultimi 3 giorni
-    params = {"db": "pubmed", "term": f'"{identifier}"[Journal] AND ("last 3 days"[PDat])', "retmax": 3, "sort": "most recent", "retmode": "json"}
+    params = {"db": "pubmed", "term": f'"{identifier}"[Journal] AND ("last 30 days"[PDat])', "retmax": 3, "sort": "most recent", "retmode": "json"}
     try:
         r = requests.get(PUBMED_ESEARCH, params=params, timeout=20)
         if r.status_code == 200:
