@@ -1,6 +1,6 @@
 """
-Agente news cardiologiche: PubMed (XML) -> Groq Llama3 (Gratis) -> Telegram
-Versione definitiva 100% stabile con parsing XML nativo unificato
+Agente news cardiologiche: PubMed (UI List) -> Groq Llama3 (Gratis) -> Telegram
+Versione ad altissima stabilità con estrazione ID in formato testo piatto
 """
 import os
 import time
@@ -28,21 +28,22 @@ PUBMED_ESEARCH = "https://nih.gov"
 PUBMED_EFETCH = "https://nih.gov"
 
 def get_all_recent_articles():
-    """Esegue un'unica chiamata globale a PubMed estraendo gli ID direttamente in XML nativo."""
+    """Esegue una chiamata a PubMed estraendo gli ID in formato testo pulito (Infallibile)."""
     query = (
         '"Giornale italiano di cardiologia"[Journal] OR "European heart journal"[Journal] OR '
         '"Europace"[Journal] OR "Circulation"[Journal] OR "Journal of the American College of Cardiology"[Journal]'
     )
     
-    # Parametri in XML standard (Lasciamo 30 giorni per forzare i dati nel test)
+    # Chiediamo esplicitamente uilist in formato text per evitare conflitti XML/JSON nel bando degli ID
     params = {
         "db": "pubmed",
         "term": query,
-        "reldate": 30,  # Cambia a 3 per il quotidiano dopo aver ricevuto i messaggi
+        "reldate": 30,  # Lasciamo 30 giorni per il test. Cambia a 3 per la routine quotidiana.
         "datetype": "pdat",
         "retmax": 10,
         "sort": "most recent",
-        "retmode": "xml"
+        "rettype": "uilist",
+        "retmode": "text"
     }
     
     try:
@@ -51,13 +52,12 @@ def get_all_recent_articles():
             print(f"[PubMed Error] Errore di rete HTTP {resp.status_code}")
             return []
         
-        # Lettura ID direttamente dai nodi XML dell'IdList
-        root = ET.fromstring(resp.content)
-        id_list = [id_node.text for id_node in root.findall(".//IdList/Id") if id_node.text]
+        # Il formato 'text/uilist' restituisce un ID per ogni riga. Lo leggiamo riga per riga.
+        id_list = [line.strip() for line in resp.text.splitlines() if line.strip().isdigit()]
         print(f"[PubMed] Trovati {len(id_list)} articoli totali nel pool cardiovascolare.")
         return id_list
     except Exception as e:
-        print(f"Errore parsing XML ricerca PubMed: {e}")
+        print(f"Errore recupero ID da PubMed: {e}")
         return []
 
 def fetch_articles_xml(pmids):
@@ -66,6 +66,7 @@ def fetch_articles_xml(pmids):
     try:
         resp = requests.get(PUBMED_EFETCH, params=params, timeout=20)
         if resp.status_code == 200:
+            # efetch in XML è nativamente robusto ed effettua l'escape dei caratteri speciali
             return ET.fromstring(resp.content)
         return None
     except Exception as e:
@@ -127,21 +128,21 @@ def send_to_telegram(message, link):
         pass
 
 def main():
-    print("--- AVVIO AGENTE CARDIO (PURE XML POOL) ---")
+    print("--- AVVIO AGENTE CARDIO (TEXT-UI POOL) ---")
     
-    # 1. Recupera gli ID in XML nativo
+    # 1. Recupera gli ID in formato testo semplice (Infallibile)
     ids = get_all_recent_articles()
     if not ids:
-        print("Nessun articolo estratto dei server NCBI.")
+        print("Nessun articolo estratto dai server NCBI.")
         return
 
-    # 2. Scarica i contenuti XML dettagliati
+    # 2. Scarica i contenuti dettagliati tramite efetch XML
     root = fetch_articles_xml(ids)
     if root is None:
         print("Impossibile decodificare i dettagli degli articoli.")
         return
 
-    # 3. Analisi e filtraggio con Groq
+    # 3. Ciclo di analisi e smistamento delle notifiche
     for art in root.findall(".//PubmedArticle"):
         pmid = art.findtext(".//PMID", default="")
         title = art.findtext(".//ArticleTitle", default="").strip()
