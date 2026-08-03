@@ -1,6 +1,6 @@
 """
-Agente news cardiologiche - FLUSSO FORZATO PER TEST
-Invia un messaggio di avvio e inoltra i primi articoli trovati senza alcun filtro IA
+Agente news cardiologiche: PubMed -> Groq Llama3 (Gratis) -> Telegram
+Versione definitiva e protetta
 """
 import os
 import time
@@ -12,7 +12,13 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
 JOURNALS = {
+    "Giornale Italiano di Cardiologia": "1827-6806",
     "European Heart Journal": "0195-668X",
+    "EHJ Acute Cardiovascular Care": "2048-8734",
+    "European Journal of Preventive Cardiology": "2047-4873",
+    "European Journal of Heart Failure": "1388-9842",
+    "Europace": "1099-5129",
+    "EHJ Cardiovascular Imaging": "2047-2412",
     "Circulation": "0009-7322",
     "JACC": "0735-1097",
 }
@@ -21,13 +27,14 @@ PUBMED_ESEARCH = "https://nih.gov"
 PUBMED_EFETCH = "https://nih.gov"
 
 def search_recent_ids(source_name, identifier):
-    # Cerchiamo gli articoli degli ultimi 30 giorni per essere sicuri di trovare dati
-    params = {"db": "pubmed", "term": f'"{identifier}"[Journal] AND ("last 30 days"[PDat])', "retmax": 1, "sort": "most recent", "retmode": "json"}
+    # Monitoraggio degli ultimi 3 giorni
+    params = {"db": "pubmed", "term": f'"{identifier}"[Journal] AND ("last 3 days"[PDat])', "retmax": 3, "sort": "most recent", "retmode": "json"}
     try:
         r = requests.get(PUBMED_ESEARCH, params=params, timeout=20)
-        return r.json().get("esearchresult", {}).get("idlist", [])
-    except Exception as e:
-        print(f"Errore PubMed {source_name}: {e}")
+        if r.status_code == 200:
+            return r.json().get("esearchresult", {}).get("idlist", [])
+        return []
+    except Exception:
         return []
 
 def fetch_articles_xml(pmids):
@@ -35,48 +42,90 @@ def fetch_articles_xml(pmids):
     params = {"db": "pubmed", "id": ",".join(pmids), "rettype": "abstract", "retmode": "xml"}
     try:
         resp = requests.get(PUBMED_EFETCH, params=params, timeout=20)
-        return ET.fromstring(resp.content)
+        if resp.status_code == 200:
+            return ET.fromstring(resp.content)
+        return None
     except Exception:
         return None
 
-def send_to_telegram(message):
-    url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
+def analyze_with_groq(title, abstract, source):
+    if not GROQ_API_KEY:
+        return "IGNORE"
+
+    url = "https://groq.com"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    prompt = f"""
+    Act as an expert cardiologist and critical care specialist. Analyze this scientific entry:
+    Source: {source}
+    Title: {title}
+    Abstract: {abstract[:2000]}
+
+    If this article is NOT a major clinical trial, a new guideline, or a crucial clinical discovery, reply ONLY with the word: IGNORE.
+    
+    If it is clinically relevant, provide a concise summary in ENGLISH formatted exactly as follows:
+    ❤️ **[ARTICLE TITLE IN ENGLISH]**
+    🏛️ *Source:* {source}
+    🎯 *Clinical Relevance:* (Max 2 sentences explaining why a practicing physician needs to know this)
+    📝 *Key Findings:* (Summarize main endpoints or results in max 4 short lines)
+    """
+    
+    data = {
+        "model": "llama3-8b-8192",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.1
+    }
+    
     try:
-        r = requests.post(url, json=payload, timeout=15)
-        print(f"[Telegram Response] Status: {r.status_code}, Body: {r.text}")
-    except Exception as e:
-        print(f"Errore connessione Telegram: {e}")
+        response = requests.post(url, json=data, headers=headers, timeout=25)
+        if response.status_code == 200:
+            return response.json()["choices"]["message"]["content"].strip()
+        return "IGNORE"
+    except Exception:
+        return "IGNORE"
+
+def send_to_telegram(message, link):
+    url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": f"{message}\n\n🔗 [Link to PubMed]({link})",
+        "parse_mode": "Markdown"
+    }
+    try:
+        requests.post(url, json=payload, timeout=15)
+    except Exception:
+        pass
 
 def main():
-    print("--- INIZIO TEST FORZATO ---")
+    print("Avvio monitoraggio gratuito con Groq...")
     
-    # 1. FORZATURA: Inviamo un messaggio immediato per capire se il canale Telegram funziona
-    print("Spedizione messaggio di controllo su Telegram...")
-    send_to_telegram("🎯 *TEST AGENTE CARDIO*: Se vedi questo messaggio, i codici Token e Chat ID su GitHub sono corretti al 100%!")
+    all_sources = dict(JOURNALS)
+    all_sources["Critical Care Reviews"] = "CC_REVIEW_SPECIAL"
 
-    for source_name, identifier in JOURNALS.items():
-        print(f"Controllo rivista: {source_name}")
+    for source_name, identifier in all_sources.items():
         ids = search_recent_ids(source_name, identifier)
-        
-        if not ids:
-            print(f"Nessun articolo nell'ultimo mese per {source_name}")
-            continue
-            
         root = fetch_articles_xml(ids)
         if root is None: continue
 
         for art in root.findall(".//PubmedArticle"):
             pmid = art.findtext(".//PMID", default="")
             title = art.findtext(".//ArticleTitle", default="").strip()
+            abstract_parts = [("".join(ab.itertext()).strip()) for ab in art.findall(".//Abstract/AbstractText")]
+            abstract = " ".join(abstract_parts).strip()
             
-            # 2. FORZATURA: Inviamo l'articolo direttamente a Telegram senza passare da Groq
-            print(f"Forzatura invio articolo: {title}")
-            test_message = f"📚 *Nuovo Articolo Trovato (Senza Filtro IA)*\n🏛️ *Source*: {source_name}\n❤️ *Title*: {title}\n🔗 https://nih.gov{pmid}/"
-            send_to_telegram(test_message)
+            if not abstract: continue
+
+            analysis = analyze_with_groq(title, abstract, source_name)
+
+            if "IGNORE" not in analysis:
+                send_to_telegram(analysis, f"https://nih.gov{pmid}/")
+                print(f"Notifica inviata per: {title}")
 
         time.sleep(1)
-    print("--- FINE TEST FORZATO ---")
+    print("Monitoraggio completato.")
 
 if __name__ == "__main__":
     main()
