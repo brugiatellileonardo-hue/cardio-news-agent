@@ -1,165 +1,32 @@
 """
-Agente news cardiologiche: PubMed (Autenticato) -> Groq Llama3 (Gratis) -> Telegram
-Versione definitiva con sblocco User-Agent contro i blocchi server di NCBI
+Script di Test Diretto per Connessione Telegram
 """
 import os
-import time
-import xml.etree.ElementTree as ET
 import requests
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 
-# Firma di navigazione protetta per impedire a PubMed di rifiutare la connessione cloud
-HTTP_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-}
+def main():
+    print("--- INIZIO VERIFICA CONNESSIONE TELEGRAM ---")
+    print(f"Token rilevato (lunghezza): {len(TELEGRAM_BOT_TOKEN)} caratteri")
+    print(f"Chat ID rilevato: {TELEGRAM_CHAT_ID}")
 
-JOURNAL_NAMES = {
-    "giornale italiano di cardiologia": "Giornale Italiano di Cardiologia",
-    "european heart journal": "European Heart Journal",
-    "acute cardiovascular care": "EHJ Acute Cardiovascular Care",
-    "preventive cardiology": "European Journal of Preventive Cardiology",
-    "heart failure": "European Journal of Heart Failure",
-    "europace": "Europace",
-    "cardiovascular imaging": "EHJ Cardiovascular Imaging",
-    "circulation": "Circulation",
-    "american college of cardiology": "JACC / ACC",
-    "critical care": "Critical Care Reviews / ICU"
-}
-
-PUBMED_ESEARCH = "https://nih.gov"
-PUBMED_EFETCH = "https://nih.gov"
-
-def get_all_recent_articles():
-    """Esegue una chiamata a PubMed firmata digitalmente con un User-Agent valido."""
-    # Query pulita per estrarre tutti i blocchi cardiologici principali
-    query = 'Eur Heart J[ta] OR Circulation[ta] OR J Am Coll Cardiol[ta] OR "G Ital Cardiol (Rome)"[ta]'
-    
-    params = {
-        "db": "pubmed",
-        "term": f"{query} AND (last 30 days[Filter])", # Mantieni 30 per il test, poi imposta a 3 per la routine
-        "retmax": 15,
-        "sort": "most recent",
-        "retmode": "json"
-    }
-    
-    try:
-        # Passiamo i parametri e l'intestazione protetta HTTP_HEADERS
-        r = requests.get(PUBMED_ESEARCH, params=params, headers=HTTP_HEADERS, timeout=20)
-        if r.status_code != 200:
-            print(f"[PubMed Error] Server irragiungibile. Codice HTTP {r.status_code}")
-            return []
-        
-        id_list = r.json().get("esearchresult", {}).get("idlist", [])
-        print(f"[PubMed] Connessione riuscita. Trovati {len(id_list)} articoli totali nel pool cardiovascolare.")
-        return id_list
-    except Exception as e:
-        print(f"Errore recupero ID da PubMed: {e}")
-        return []
-
-def fetch_articles_xml(pmids):
-    if not pmids: return None
-    params = {"db": "pubmed", "id": ",".join(pmids), "rettype": "abstract", "retmode": "xml"}
-    try:
-        resp = requests.get(PUBMED_EFETCH, params=params, headers=HTTP_HEADERS, timeout=20)
-        if resp.status_code == 200:
-            return ET.fromstring(resp.content)
-        return None
-    except Exception as e:
-        print(f"Errore recupero dettagli XML: {e}")
-        return None
-
-def identify_source(journal_title):
-    title_lower = journal_title.lower()
-    for key, output_name in JOURNAL_NAMES.items():
-        if key in title_lower:
-            return output_name
-    return "Cardiology Journal"
-
-def analyze_with_groq(title, abstract, source):
-    if not GROQ_API_KEY: return "IGNORE"
-
-    url = "https://groq.com"
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-    
-    prompt = f"""
-    Act as an expert cardiologist and critical care specialist. Analyze this scientific entry:
-    Source: {source}
-    Title: {title}
-    Abstract: {abstract[:1800]}
-
-    If this article is NOT a major clinical trial, a new guideline, or a crucial clinical discovery, reply ONLY with the word: IGNORE.
-    
-    If it is clinically relevant, provide a concise summary in ENGLISH formatted exactly as follows:
-    ❤️ **[ARTICLE TITLE IN ENGLISH]**
-    🏛️ *Source:* {source}
-    🎯 *Clinical Relevance:* (Max 2 sentences explaining why a practicing physician needs to know this)
-    📝 *Key Findings:* (Summarize main endpoints or results in max 4 short lines)
-    """
-    
-    data = {
-        "model": "llama3-8b-8192",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.1
-    }
-    
-    try:
-        response = requests.post(url, json=data, headers=headers, timeout=25)
-        if response.status_code == 200:
-            return response.json()["choices"]["message"]["content"].strip()
-        return "IGNORE"
-    except Exception:
-        return "IGNORE"
-
-def send_to_telegram(message, link):
-    endpoint = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage"
+    url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": TELEGRAM_CHAT_ID,
-        "text": f"{message}\n\n🔗 [Link to PubMed]({link})",
+        "text": "🔌 *CONNESSO!* L'agente cardio riesce a comunicare con il tuo smartphone. Il ponte di Telegram è configurato correttamente!",
         "parse_mode": "Markdown"
     }
+
     try:
-        requests.post(endpoint, json=payload, timeout=15)
-    except Exception:
-        pass
-
-def main():
-    print("--- AVVIO AGENTE CARDIO (SBLOCCO USER-AGENT) ---")
-    
-    # 1. Recupera gli ID aggirando i blocchi NCBI
-    ids = get_all_recent_articles()
-    if not ids:
-        print("Nessun articolo estratto. I server PubMed stanno bloccando la richiesta cloud.")
-        return
-
-    # 2. Scarica i contenuti dettagliati XML
-    root = fetch_articles_xml(ids)
-    if root is None:
-        print("Impossibile decodificare i dettagli degli articoli.")
-        return
-
-    # 3. Analisi dei trial ed invio su Telegram
-    for art in root.findall(".//PubmedArticle"):
-        pmid = art.findtext(".//PMID", default="")
-        title = art.findtext(".//ArticleTitle", default="").strip()
-        raw_journal = art.findtext(".//Journal/Title", default="Cardiology")
+        response = requests.post(url, json=payload, timeout=15)
+        print(f"Risposta ufficiale del server Telegram (Status Code): {response.status_code}")
+        print(f"Contenuto risposta: {response.text}")
+    except Exception as e:
+        print(f"Errore di rete durante la connessione a Telegram: {e}")
         
-        abstract_parts = [("".join(ab.itertext()).strip()) for ab in art.findall(".//Abstract/AbstractText")]
-        abstract = " ".join(abstract_parts).strip()
-        
-        if not abstract: continue
-
-        source_detected = identify_source(raw_journal)
-        analysis = analyze_with_groq(title, abstract, source_detected)
-
-        if "IGNORE" not in analysis:
-            send_to_telegram(analysis, f"https://nih.gov{pmid}/")
-            print(f"Notifica inoltrata con successo per PMID: {pmid}")
-            time.sleep(1)
-
-    print("--- MONITORAGGIO COMPLETATO ---")
+    print("--- FINE VERIFICA ---")
 
 if __name__ == "__main__":
     main()
