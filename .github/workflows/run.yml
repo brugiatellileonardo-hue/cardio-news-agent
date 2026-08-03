@@ -1,0 +1,30 @@
+name: Run Cardio News Agent
+
+on:
+  schedule:
+    # Esegue l'agente ogni mattina alle 07:00 UTC (le 08:00 o 09:00 in Italia a seconda dell'ora legale)
+    - cron: '0 7 * * *'
+  workflow_dispatch: # Questo ti permette di avviare l'agente manualmente con un clic per fare i test
+
+jobs:
+  run-cardio-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install required libraries
+        run: |
+          pip install requests
+
+      - name: Execute PubMed and DeepSeek Agent
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python cardio_agent.py
