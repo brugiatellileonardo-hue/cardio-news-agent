@@ -1,19 +1,16 @@
 """
-Agente news cardiologiche: PubMed -> DeepSeek (filtro) -> Telegram
-Versione ultra-stabile contro i crash (Exit Code 2)
+Agente news cardiologiche: PubMed -> Groq Llama3 (Gratis) -> Telegram
+Versione 100% gratuita senza scadenze o costi di credito
 """
 import os
 import time
 import xml.etree.ElementTree as ET
 import requests
 
-# --- CONFIGURAZIONE SICURA (Lettura da GitHub Secrets) ---
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
-NCBI_API_KEY = os.environ.get("NCBI_API_KEY", "")
 
-# Database riviste aggiornato con ISSN ufficiali e fonti richieste
 JOURNALS = {
     "Giornale Italiano di Cardiologia": "1827-6806",
     "European Heart Journal": "0195-668X",
@@ -29,112 +26,58 @@ JOURNALS = {
 PUBMED_ESEARCH = "https://nih.gov"
 PUBMED_EFETCH = "https://nih.gov"
 
-def _base_params(extra):
-    p = dict(extra)
-    if NCBI_API_KEY:
-        p["api_key"] = NCBI_API_KEY
-    return p
-
-def search_recent_ids(source_name, identifier, max_results=3):
-    if source_name == "Critical Care Reviews":
-        term = '("Critical Care Reviews"[Journal] OR "Critical Care"[Journal]) AND ("last 3 days"[PDat]) AND (trial[Title/Abstract] OR guideline[Title/Abstract])'
-    else:
-        term = f'"{identifier}"[Journal] AND ("last 3 days"[PDat])'
-
-    params = _base_params({
-        "db": "pubmed",
-        "term": term,
-        "retmax": max_results,
-        "sort": "most recent",
-        "retmode": "json",
-    })
+def search_recent_ids(source_name, identifier):
+    params = {"db": "pubmed", "term": f'"{identifier}"[Journal] AND ("last 3 days"[PDat])', "retmax": 3, "sort": "most recent", "retmode": "json"}
     try:
         r = requests.get(PUBMED_ESEARCH, params=params, timeout=20)
-        r.raise_for_status()
         return r.json().get("esearchresult", {}).get("idlist", [])
-    except Exception as e:
-        print(f"Avviso: Errore ricerca PubMed per {source_name}: {e}")
+    except Exception:
         return []
 
 def fetch_articles_xml(pmids):
-    if not pmids:
-        return []
-    params = _base_params({
-        "db": "pubmed",
-        "id": ",".join(pmids),
-        "rettype": "abstract",
-        "retmode": "xml",
-    })
+    if not pmids: return []
+    params = {"db": "pubmed", "id": ",".join(pmids), "rettype": "abstract", "retmode": "xml"}
     try:
         resp = requests.get(PUBMED_EFETCH, params=params, timeout=20)
-        resp.raise_for_status()
-        root = ET.fromstring(resp.content)
-    except Exception as e:
-        print(f"Avviso: Errore recupero XML PubMed: {e}")
-        return []
+        return ET.fromstring(resp.content)
+    except Exception:
+        return None
 
-    articles = []
-    for art in root.findall(".//PubmedArticle"):
-        pmid = art.findtext(".//PMID", default="")
-        title = art.findtext(".//ArticleTitle", default="").strip()
-
-        abstract_parts = []
-        for ab_text in art.findall(".//Abstract/AbstractText"):
-            label = ab_text.get("Label")
-            text = "".join(ab_text.itertext()).strip()
-            if not text:
-                continue
-            abstract_parts.append(f"{label}: {text}" if label else text)
-        abstract = " ".join(abstract_parts).strip()
-
-        articles.append({
-            "pmid": pmid,
-            "title": title,
-            "abstract": abstract,
-            "link": f"https://nih.gov{pmid}/",
-        })
-    return articles
-
-def analyze_with_deepseek(title, abstract, source):
-    url = "https://deepseek.com"
+def analyze_with_groq(title, abstract, source):
+    """Interroga l'infrastruttura gratuita di Groq utilizzando Llama 3."""
+    url = "https://groq.com"
     headers = {
-        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-        "Content-Type": "application/json",
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
     }
-
+    
     prompt = f"""
-Act as a clinical cardiologist and intensive care specialist. Point out updates for physicians.
-Analyze this publication:
-Source: {source}
-Original Title: {title}
-Abstract: {abstract[:2500]}
+    Act as an expert cardiologist and critical care specialist. Analyze this scientific entry:
+    Source: {source}
+    Title: {title}
+    Abstract: {abstract[:2000]}
 
-If the article is NOT a relevant clinical trial, a new guideline, an important meta-analysis, or a crucial clinical finding,
-reply ONLY with the word: IGNORE.
-
-If relevant, provide text in ENGLISH formatted exactly like this:
-❤️ **[TITLE IN ENGLISH]**
-🏛️ *Source:* {source}
-🎯 *Clinical Relevance:* (2 lines max explaining why a physician should care)
-📝 *Summary of Findings:* (max 4 lines pinpointing endpoints and results)
-"""
-
+    If this article is NOT a major clinical trial, a new guideline, or a crucial clinical discovery, reply ONLY with the word: IGNORE.
+    
+    If it is clinically relevant, provide a concise summary in ENGLISH formatted exactly as follows:
+    ❤️ **[ARTICLE TITLE IN ENGLISH]**
+    🏛️ *Source:* {source}
+    🎯 *Clinical Relevance:* (Max 2 sentences explaining why a practicing physician needs to know this)
+    📝 *Key Findings:* (Summarize main endpoints or results in max 4 short lines)
+    """
+    
     data = {
-        "model": "deepseek-chat",
+        "model": "llama3-8b-8192",  # Modello ultra-veloce e gratuito su Groq
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.1,
+        "temperature": 0.1
     }
-
+    
     try:
-        response = requests.post(url, json=data, headers=headers, timeout=30)
-        res_json = response.json()
-        if "choices" in res_json:
-            return res_json["choices"][0]["message"]["content"].strip()
-        else:
-            print(f"Errore risposta DeepSeek (Verifica credito o API Key): {res_json}")
-            return "IGNORE"
-    except Exception as e:
-        print(f"Errore di rete DeepSeek: {e}")
+        response = requests.post(url, json=data, headers=headers, timeout=25)
+        if response.status_code == 200:
+            return response.json()["choices"][0]["message"]["content"].strip()
+        return "IGNORE"
+    except Exception:
         return "IGNORE"
 
 def send_to_telegram(message, link):
@@ -142,37 +85,40 @@ def send_to_telegram(message, link):
     payload = {
         "chat_id": TELEGRAM_CHAT_ID,
         "text": f"{message}\n\n🔗 [Link to PubMed]({link})",
-        "parse_mode": "Markdown",
+        "parse_mode": "Markdown"
     }
     try:
-        requests.post(url, json=payload, timeout=20)
-    except Exception as e:
-        print(f"Errore invio Telegram: {e}")
+        requests.post(url, json=payload, timeout=15)
+    except Exception:
+        pass
 
 def main():
-    print("Avvio monitoraggio avanzato news (PubMed + DeepSeek)...")
+    print("Avvio monitoraggio gratuito con Groq...")
     
     all_sources = dict(JOURNALS)
     all_sources["Critical Care Reviews"] = "CC_REVIEW_SPECIAL"
 
     for source_name, identifier in all_sources.items():
-        print(f"Controllo fonte: {source_name}")
         ids = search_recent_ids(source_name, identifier)
-        articles = fetch_articles_xml(ids)
+        root = fetch_articles_xml(ids)
+        if root is None: continue
 
-        for art in articles:
-            if not art["abstract"]:
-                continue
+        for art in root.findall(".//PubmedArticle"):
+            pmid = art.findtext(".//PMID", default="")
+            title = art.findtext(".//ArticleTitle", default="").strip()
+            abstract_parts = [("".join(ab.itertext()).strip()) for ab in art.findall(".//Abstract/AbstractText")]
+            abstract = " ".join(abstract_parts).strip()
+            
+            if not abstract: continue
 
-            analysis = analyze_with_deepseek(art["title"], art["abstract"], source_name)
+            analysis = analyze_with_groq(title, abstract, source_name)
 
             if "IGNORE" not in analysis:
-                send_to_telegram(analysis, art["link"])
-                print(f"Notifica inviata con successo per: {art['title']}")
+                send_to_telegram(analysis, f"https://nih.gov{pmid}/")
+                print(f"Notifica inviata per: {title}")
 
-        time.sleep(0.4 if NCBI_API_KEY else 1.2)
-
-    print("Monitoraggio completato con successo.")
+        time.sleep(1)
+    print("Monitoraggio completato.")
 
 if __name__ == "__main__":
     main()
