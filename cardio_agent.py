@@ -1,6 +1,6 @@
 """
-Agente news cardiologiche: PubMed -> Groq Llama3 (Gratis) -> Telegram
-Versione con query centralizzata e protezione contro i blocchi API
+Agente news cardiologiche: PubMed (XML) -> Groq Llama3 (Gratis) -> Telegram
+Versione definitiva 100% stabile con parsing XML nativo unificato
 """
 import os
 import time
@@ -11,7 +11,6 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 
-# Mappatura pulita per il riconoscimento della fonte nell'output
 JOURNAL_NAMES = {
     "giornale italiano di cardiologia": "Giornale Italiano di Cardiologia",
     "european heart journal": "European Heart Journal",
@@ -29,36 +28,36 @@ PUBMED_ESEARCH = "https://nih.gov"
 PUBMED_EFETCH = "https://nih.gov"
 
 def get_all_recent_articles():
-    """Esegue un'UNICA chiamata globale a PubMed per tutte le testate negli ultimi 30 giorni."""
-    # Costruiamo una query testuale pulita e tollerata dall'API senza tag aggrovigliati
+    """Esegue un'unica chiamata globale a PubMed estraendo gli ID direttamente in XML nativo."""
     query = (
-        '"Giornale italiano di cardiologia" OR "European heart journal" OR "Europace" OR '
-        '"Circulation" OR "Journal of the American College of Cardiology" OR "Critical Care Reviews"'
+        '"Giornale italiano di cardiologia"[Journal] OR "European heart journal"[Journal] OR '
+        '"Europace"[Journal] OR "Circulation"[Journal] OR "Journal of the American College of Cardiology"[Journal]'
     )
     
-    # Parametri ottimizzati (Usa reldate=3 per il quotidiano, lasciamo 30 per essere certi del test visivo)
+    # Parametri in XML standard (Lasciamo 30 giorni per forzare i dati nel test)
     params = {
         "db": "pubmed",
         "term": query,
-        "reldate": 30, 
+        "reldate": 30,  # Cambia a 3 per il quotidiano dopo aver ricevuto i messaggi
         "datetype": "pdat",
-        "retmax": 15,
+        "retmax": 10,
         "sort": "most recent",
-        "retmode": "json"
+        "retmode": "xml"
     }
     
     try:
-        r = requests.get(PUBMED_ESEARCH, params=params, timeout=20)
-        # Se il server risponde con testo sporco (HTML), evitiamo il crash controllando il content-type
-        if r.status_code != 200 or "json" not in r.headers.get("Content-Type", ""):
-            print(f"[PubMed Error] Il server ha risposto con formato non valido (HTTP {r.status_code}).")
+        resp = requests.get(PUBMED_ESEARCH, params=params, timeout=20)
+        if resp.status_code != 200:
+            print(f"[PubMed Error] Errore di rete HTTP {resp.status_code}")
             return []
         
-        id_list = r.json().get("esearchresult", {}).get("idlist", [])
+        # Lettura ID direttamente dai nodi XML dell'IdList
+        root = ET.fromstring(resp.content)
+        id_list = [id_node.text for id_node in root.findall(".//IdList/Id") if id_node.text]
         print(f"[PubMed] Trovati {len(id_list)} articoli totali nel pool cardiovascolare.")
         return id_list
     except Exception as e:
-        print(f"Errore connessione di ricerca PubMed: {e}")
+        print(f"Errore parsing XML ricerca PubMed: {e}")
         return []
 
 def fetch_articles_xml(pmids):
@@ -74,7 +73,6 @@ def fetch_articles_xml(pmids):
         return None
 
 def identify_source(journal_title):
-    """Associa il titolo esteso restituito da PubMed a una delle tue macro-fonti."""
     title_lower = journal_title.lower()
     for key, output_name in JOURNAL_NAMES.items():
         if key in title_lower:
@@ -129,42 +127,38 @@ def send_to_telegram(message, link):
         pass
 
 def main():
-    print("--- AVVIO AGENTE CARDIO (POOL UNIFICATO) ---")
+    print("--- AVVIO AGENTE CARDIO (PURE XML POOL) ---")
     
-    # 1. Recupera tutti gli ID in un colpo solo
+    # 1. Recupera gli ID in XML nativo
     ids = get_all_recent_articles()
     if not ids:
-        print("Nessun articolo estratto o blocco temporaneo dei server NCBI.")
+        print("Nessun articolo estratto dei server NCBI.")
         return
 
-    # 2. Scarica i contenuti XML
+    # 2. Scarica i contenuti XML dettagliati
     root = fetch_articles_xml(ids)
     if root is None:
         print("Impossibile decodificare i dettagli degli articoli.")
         return
 
-    # 3. Ciclo di analisi
+    # 3. Analisi e filtraggio con Groq
     for art in root.findall(".//PubmedArticle"):
         pmid = art.findtext(".//PMID", default="")
         title = art.findtext(".//ArticleTitle", default="").strip()
         raw_journal = art.findtext(".//Journal/Title", default="Cardiology")
         
-        # Estrazione abstract
         abstract_parts = [("".join(ab.itertext()).strip()) for ab in art.findall(".//Abstract/AbstractText")]
         abstract = " ".join(abstract_parts).strip()
         
         if not abstract: continue
 
-        # Identifica la testata corretta
         source_detected = identify_source(raw_journal)
-        
-        # Filtro intelligente Groq
         analysis = analyze_with_groq(title, abstract, source_detected)
 
         if "IGNORE" not in analysis:
-            send_to_telegram(analysis, f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/")
+            send_to_telegram(analysis, f"https://nih.gov{pmid}/")
             print(f"Notifica inoltrata con successo per PMID: {pmid}")
-            time.sleep(1) # Dilaziona gli invii per non sovraccaricare il bot
+            time.sleep(1)
 
     print("--- MONITORAGGIO COMPLETATO ---")
 
