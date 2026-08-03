@@ -1,40 +1,52 @@
 """
 Agente news cardiologiche: PubMed -> Groq Llama3 (Gratis) -> Telegram
-Versione definitiva e protetta
+Versione con query di ricerca PubMed ottimizzata per risposte reali
 """
 import os
 import time
 import xml.etree.ElementTree as ET
 import requests
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 
+# Elenco ottimizzato: cerchiamo sia per ISSN sia per nome per massimizzare i risultati
 JOURNALS = {
-    "Giornale Italiano di Cardiologia": "1827-6806",
-    "European Heart Journal": "0195-668X",
-    "EHJ Acute Cardiovascular Care": "2048-8734",
-    "European Journal of Preventive Cardiology": "2047-4873",
-    "European Journal of Heart Failure": "1388-9842",
-    "Europace": "1099-5129",
-    "EHJ Cardiovascular Imaging": "2047-2412",
-    "Circulation": "0009-7322",
-    "JACC": "0735-1097",
+    "Giornale Italiano di Cardiologia": "Giornale italiano di cardiologia[Journal]",
+    "European Heart Journal": "European heart journal[Journal]",
+    "EHJ Acute Cardiovascular Care": "European heart journal acute cardiovascular care[Journal]",
+    "European Journal of Preventive Cardiology": "European journal of preventive cardiology[Journal]",
+    "European Journal of Heart Failure": "European journal of heart failure[Journal]",
+    "Europace": "Europace[Journal]",
+    "EHJ Cardiovascular Imaging": "European heart journal cardiovascular Imaging[Journal]",
+    "Circulation": "Circulation[Journal]",
+    "JACC": "Journal of the American College of Cardiology[Journal]",
 }
 
 PUBMED_ESEARCH = "https://nih.gov"
 PUBMED_EFETCH = "https://nih.gov"
 
-def search_recent_ids(source_name, identifier):
-    # Monitoraggio degli ultimi 3 giorni
-    params = {"db": "pubmed", "term": f'"{identifier}"[Journal] AND ("last 30 days"[PDat])', "retmax": 3, "sort": "most recent", "retmode": "json"}
+def search_recent_ids(source_name, query_term):
+    # Usiamo reldate=30 (ultimi 30 giorni) e datetype=pdat per forzare PubMed a rispondere
+    params = {
+        "db": "pubmed",
+        "term": query_term,
+        "reldate": 30,       # Cambia a 3 per il monitoraggio quotidiano dopo il test
+        "datetype": "pdat",
+        "retmax": 5,
+        "sort": "most recent",
+        "retmode": "json"
+    }
     try:
         r = requests.get(PUBMED_ESEARCH, params=params, timeout=20)
         if r.status_code == 200:
-            return r.json().get("esearchresult", {}).get("idlist", [])
+            id_list = r.json().get("esearchresult", {}).get("idlist", [])
+            print(f"[PubMed Search] {source_name}: trovati {len(id_list)} articoli.")
+            return id_list
         return []
-    except Exception:
+    except Exception as e:
+        print(f"Errore ricerca PubMed {source_name}: {e}")
         return []
 
 def fetch_articles_xml(pmids):
@@ -88,25 +100,34 @@ def analyze_with_groq(title, abstract, source):
         return "IGNORE"
 
 def send_to_telegram(message, link):
-    url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage"
+    base_url = "https://api.telegram.org"
+    endpoint = f"{base_url}/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    
     payload = {
         "chat_id": TELEGRAM_CHAT_ID,
         "text": f"{message}\n\n🔗 [Link to PubMed]({link})",
         "parse_mode": "Markdown"
     }
     try:
-        requests.post(url, json=payload, timeout=15)
-    except Exception:
-        pass
+        r = requests.post(endpoint, json=payload, timeout=15)
+        if r.status_code != 200:
+            print(f"[Telegram Error] Status {r.status_code}")
+    except Exception as e:
+        print(f"Errore Telegram: {e}")
 
 def main():
-    print("Avvio monitoraggio gratuito con Groq...")
+    print("--- AVVIO AGENTE CARDIO (QUERY OTTIMIZZATA) ---")
     
     all_sources = dict(JOURNALS)
-    all_sources["Critical Care Reviews"] = "CC_REVIEW_SPECIAL"
+    # Gestione per Critical Care Reviews basata su parole chiave stabili
+    all_sources["Critical Care Reviews"] = "(critical care[Journal]) AND (trial[Title/Abstract] OR guideline[Title/Abstract])"
 
-    for source_name, identifier in all_sources.items():
-        ids = search_recent_ids(source_name, identifier)
+    for source_name, query_term in all_sources.items():
+        ids = search_recent_ids(source_name, query_term)
+        
+        if not ids:
+            continue
+            
         root = fetch_articles_xml(ids)
         if root is None: continue
 
@@ -118,14 +139,15 @@ def main():
             
             if not abstract: continue
 
+            # Chiamata all'IA per filtrare solo i trial reali
             analysis = analyze_with_groq(title, abstract, source_name)
 
             if "IGNORE" not in analysis:
-                send_to_telegram(analysis, f"https://nih.gov{pmid}/")
-                print(f"Notifica inviata per: {title}")
+                send_to_telegram(analysis, f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/")
+                print(f"Inviata notifica per: {title}")
 
         time.sleep(1)
-    print("Monitoraggio completato.")
+    print("--- MONITORAGGIO COMPLETATO ---")
 
 if __name__ == "__main__":
     main()
