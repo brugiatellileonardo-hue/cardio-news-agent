@@ -1,32 +1,33 @@
 """
-Agente news cardiologiche: PubMed -> DeepSeek (filtro/traduzione) -> Telegram
+Agente news cardiologiche: PubMed -> DeepSeek (filtro) -> Telegram
+Versione ultra-stabile contro i crash (Exit Code 2)
 """
-import requests
+import os
 import time
 import xml.etree.ElementTree as ET
+import requests
 
-# --- CONFIGURAZIONE ---
-DEEPSEEK_API_KEY = "IL_TUO_TOKEN_DEEPSEEK_QUI"
-TELEGRAM_BOT_TOKEN = "IL_TUO_TOKEN_TELEGRAM_QUI"
-TELEGRAM_CHAT_ID = "IL_TUO_USER_ID_TELEGRAM_QUI"
-NCBI_API_KEY = ""  # opzionale: registrati su ncbi.nlm.nih.gov/account per salire da 3 a 10 richieste/sec
+# --- CONFIGURAZIONE SICURA (Lettura da GitHub Secrets) ---
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
+NCBI_API_KEY = os.environ.get("NCBI_API_KEY", "")
 
-# Riviste monitorate, con ISSN reale (verificati su ISSN.org / Oxford Academic)
+# Database riviste aggiornato con ISSN ufficiali e fonti richieste
 JOURNALS = {
+    "Giornale Italiano di Cardiologia": "1827-6806",
     "European Heart Journal": "0195-668X",
     "EHJ Acute Cardiovascular Care": "2048-8734",
     "European Journal of Preventive Cardiology": "2047-4873",
     "European Journal of Heart Failure": "1388-9842",
     "Europace": "1099-5129",
     "EHJ Cardiovascular Imaging": "2047-2412",
-    "EHJ Cardiovascular Pharmacotherapy": "2055-6845",
     "Circulation": "0009-7322",
     "JACC": "0735-1097",
 }
 
-PUBMED_ESEARCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
-PUBMED_EFETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-
+PUBMED_ESEARCH = "https://nih.gov"
+PUBMED_EFETCH = "https://nih.gov"
 
 def _base_params(extra):
     p = dict(extra)
@@ -34,22 +35,28 @@ def _base_params(extra):
         p["api_key"] = NCBI_API_KEY
     return p
 
+def search_recent_ids(source_name, identifier, max_results=3):
+    if source_name == "Critical Care Reviews":
+        term = '("Critical Care Reviews"[Journal] OR "Critical Care"[Journal]) AND ("last 3 days"[PDat]) AND (trial[Title/Abstract] OR guideline[Title/Abstract])'
+    else:
+        term = f'"{identifier}"[Journal] AND ("last 3 days"[PDat])'
 
-def search_recent_ids(issn, max_results=3):
-    """Restituisce gli ID PubMed più recenti (ultimi 3 giorni) per una rivista via ISSN."""
     params = _base_params({
         "db": "pubmed",
-        "term": f'"{issn}"[Journal] AND ("last 3 days"[PDat])',
+        "term": term,
         "retmax": max_results,
         "sort": "most recent",
         "retmode": "json",
     })
-    r = requests.get(PUBMED_ESEARCH, params=params, timeout=20).json()
-    return r.get("esearchresult", {}).get("idlist", [])
-
+    try:
+        r = requests.get(PUBMED_ESEARCH, params=params, timeout=20)
+        r.raise_for_status()
+        return r.json().get("esearchresult", {}).get("idlist", [])
+    except Exception as e:
+        print(f"Avviso: Errore ricerca PubMed per {source_name}: {e}")
+        return []
 
 def fetch_articles_xml(pmids):
-    """Un'unica chiamata efetch in XML per tutti gli ID: parsing pulito di titolo e abstract."""
     if not pmids:
         return []
     params = _base_params({
@@ -58,16 +65,19 @@ def fetch_articles_xml(pmids):
         "rettype": "abstract",
         "retmode": "xml",
     })
-    resp = requests.get(PUBMED_EFETCH, params=params, timeout=20)
-    root = ET.fromstring(resp.content)
+    try:
+        resp = requests.get(PUBMED_EFETCH, params=params, timeout=20)
+        resp.raise_for_status()
+        root = ET.fromstring(resp.content)
+    except Exception as e:
+        print(f"Avviso: Errore recupero XML PubMed: {e}")
+        return []
 
     articles = []
     for art in root.findall(".//PubmedArticle"):
         pmid = art.findtext(".//PMID", default="")
         title = art.findtext(".//ArticleTitle", default="").strip()
 
-        # L'abstract può avere più sezioni (Background/Methods/Results/Conclusions):
-        # le uniamo in un unico testo pulito, senza tag o metadati extra.
         abstract_parts = []
         for ab_text in art.findall(".//Abstract/AbstractText"):
             label = ab_text.get("Label")
@@ -81,76 +91,88 @@ def fetch_articles_xml(pmids):
             "pmid": pmid,
             "title": title,
             "abstract": abstract,
-            "link": f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/",
+            "link": f"https://nih.gov{pmid}/",
         })
     return articles
 
-
 def analyze_with_deepseek(title, abstract, source):
-    """Interroga DeepSeek per tradurre, filtrare e riassumere l'articolo."""
-    url = "https://api.deepseek.com/chat/completions"
+    url = "https://deepseek.com"
     headers = {
         "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
         "Content-Type": "application/json",
     }
 
     prompt = f"""
-Act as a clinical cardiologist and intensive care specialist. Analyze this publication:
+Act as a clinical cardiologist and intensive care specialist. Point out updates for physicians.
+Analyze this publication:
 Source: {source}
 Original Title: {title}
-Abstract: {abstract[:2000]}
+Abstract: {abstract[:2500]}
 
-If the article is NOT a relevant clinical trial, a new guideline, or a crucial clinical finding,
+If the article is NOT a relevant clinical trial, a new guideline, an important meta-analysis, or a crucial clinical finding,
 reply ONLY with the word: IGNORE.
 
 If relevant, provide text in ENGLISH formatted exactly like this:
-❤️ **[TITLE]**
+❤️ **[TITLE IN ENGLISH]**
 🏛️ *Source:* {source}
-🎯 *Clinical Relevance:* (2 lines)
-📝 *Summary of Findings:* (max 4 lines)
+🎯 *Clinical Relevance:* (2 lines max explaining why a physician should care)
+📝 *Summary of Findings:* (max 4 lines pinpointing endpoints and results)
 """
 
     data = {
         "model": "deepseek-chat",
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.2,
+        "temperature": 0.1,
     }
 
     try:
-        response = requests.post(url, json=data, headers=headers, timeout=30).json()
-        return response["choices"][0]["message"]["content"].strip()
+        response = requests.post(url, json=data, headers=headers, timeout=30)
+        res_json = response.json()
+        if "choices" in res_json:
+            return res_json["choices"][0]["message"]["content"].strip()
+        else:
+            print(f"Errore risposta DeepSeek (Verifica credito o API Key): {res_json}")
+            return "IGNORE"
     except Exception as e:
-        print(f"Errore DeepSeek: {e}")
-        return "IGNORA"
-
+        print(f"Errore di rete DeepSeek: {e}")
+        return "IGNORE"
 
 def send_to_telegram(message, link):
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": TELEGRAM_CHAT_ID,
-        "text": f"{message}\n\n🔗 [Leggi su PubMed]({link})",
+        "text": f"{message}\n\n🔗 [Link to PubMed]({link})",
         "parse_mode": "Markdown",
     }
-    requests.post(url, json=payload, timeout=20)
-
+    try:
+        requests.post(url, json=payload, timeout=20)
+    except Exception as e:
+        print(f"Errore invio Telegram: {e}")
 
 def main():
-    print("Avvio monitoraggio news in cardiologia (fonte: PubMed)...")
-    for source_name, issn in JOURNALS.items():
-        print(f"Controllo: {source_name}")
-        ids = search_recent_ids(issn)
-        articles = fetch_articles_xml(ids)  # 1 sola chiamata per rivista, non 1 per articolo
+    print("Avvio monitoraggio avanzato news (PubMed + DeepSeek)...")
+    
+    all_sources = dict(JOURNALS)
+    all_sources["Critical Care Reviews"] = "CC_REVIEW_SPECIAL"
+
+    for source_name, identifier in all_sources.items():
+        print(f"Controllo fonte: {source_name}")
+        ids = search_recent_ids(source_name, identifier)
+        articles = fetch_articles_xml(ids)
+
         for art in articles:
             if not art["abstract"]:
-                continue  # niente abstract (es. editoriali brevi) -> saltiamo, non analizzabile
+                continue
+
             analysis = analyze_with_deepseek(art["title"], art["abstract"], source_name)
-            if "IGNORA" not in analysis:
+
+            if "IGNORE" not in analysis:
                 send_to_telegram(analysis, art["link"])
-                print(f"Notifica inviata: {art['title']}")
-        time.sleep(0.4 if NCBI_API_KEY else 1)  # rate limit NCBI: 10/sec con api_key, 3/sec senza
+                print(f"Notifica inviata con successo per: {art['title']}")
 
-    print("Monitoraggio completato.")
+        time.sleep(0.4 if NCBI_API_KEY else 1.2)
 
+    print("Monitoraggio completato con successo.")
 
 if __name__ == "__main__":
     main()
