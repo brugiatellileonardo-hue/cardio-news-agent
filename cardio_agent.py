@@ -1,6 +1,6 @@
 """
 Agente news cardiologiche: PubMed -> Groq Llama3 (Gratis) -> Telegram
-Versione diagnostica allineata e protetta dai blocchi
+Versione ultra-stabile con correzione per risposte vuote di PubMed
 """
 import os
 import time
@@ -30,24 +30,29 @@ def search_recent_ids(source_name, identifier):
     params = {"db": "pubmed", "term": f'"{identifier}"[Journal] AND ("last 3 days"[PDat])', "retmax": 2, "sort": "most recent", "retmode": "json"}
     try:
         r = requests.get(PUBMED_ESEARCH, params=params, timeout=20)
-        return r.json().get("esearchresult", {}).get("idlist", [])
+        if r.status_code == 200:
+            return r.json().get("esearchresult", {}).get("idlist", [])
+        return []
     except Exception as e:
-        print(f"Errore ricerca PubMed {source_name}: {e}")
+        print(f"Avviso: Errore ricerca PubMed {source_name}: {e}")
         return []
 
 def fetch_articles_xml(pmids):
-    if not pmids: return []
+    if not pmids: 
+        return None
     params = {"db": "pubmed", "id": ",".join(pmids), "rettype": "abstract", "retmode": "xml"}
     try:
         resp = requests.get(PUBMED_EFETCH, params=params, timeout=20)
-        return ET.fromstring(resp.content)
+        if resp.status_code == 200:
+            return ET.fromstring(resp.content)
+        return None
     except Exception as e:
-        print(f"Errore XML PubMed: {e}")
+        print(f"Avviso: Errore XML PubMed: {e}")
         return None
 
 def analyze_with_groq(title, abstract, source):
     if not GROQ_API_KEY:
-        print("[DEBUG ERRORE] Chiave GROQ_API_KEY non rilevata dal sistema!")
+        print("[DEBUG] GROQ_API_KEY mancante nei Secrets!")
         return "IGNORE"
 
     url = "https://groq.com"
@@ -79,11 +84,10 @@ def analyze_with_groq(title, abstract, source):
     try:
         response = requests.post(url, json=data, headers=headers, timeout=25)
         if response.status_code == 200:
-            return response.json()["choices"][0]["message"]["content"].strip()
-        print(f"[DEBUG GROQ HTTP ERROR] Code {response.status_code}: {response.text}")
+            return response.json()["choices"]["message"]["content"].strip()
+        print(f"[DEBUG GROQ ERROR] Code {response.status_code}: {response.text}")
         return "IGNORE"
-    except Exception as e:
-        print(f"Errore chiamata Groq: {e}")
+    except Exception:
         return "IGNORE"
 
 def send_to_telegram(message, link):
@@ -92,7 +96,7 @@ def send_to_telegram(message, link):
     try:
         requests.post(url, json=payload, timeout=15)
     except Exception as e:
-        print(f"Errore invio Telegram: {e}")
+        print(f"Errore Telegram: {e}")
 
 def main():
     print("--- AVVIO AGENTE GENERALE (CONNESSO A GROQ CLOUD) ---")
@@ -103,8 +107,15 @@ def main():
     for source_name, identifier in all_sources.items():
         print(f"Analisi canale: {source_name}")
         ids = search_recent_ids(source_name, identifier)
+        
+        # CORREZIONE: Se non ci sono ID o la ricerca è vuota, salta senza mandare in crash lo script
+        if not ids:
+            print(f"Nessun articolo trovato per {source_name} negli ultimi 3 giorni. Salto.")
+            continue
+            
         root = fetch_articles_xml(ids)
-        if root is None: continue
+        if root is None: 
+            continue
 
         for art in root.findall(".//PubmedArticle"):
             pmid = art.findtext(".//PMID", default="")
@@ -112,7 +123,8 @@ def main():
             abstract_parts = [("".join(ab.itertext()).strip()) for ab in art.findall(".//Abstract/AbstractText")]
             abstract = " ".join(abstract_parts).strip()
             
-            if not abstract: continue
+            if not abstract: 
+                continue
 
             analysis = analyze_with_groq(title, abstract, source_name)
 
