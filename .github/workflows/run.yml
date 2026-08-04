@@ -1,13 +1,13 @@
 name: Run Cardio News Agent
-
 on:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: '0 6 * * *'   # ~7:00 Italia (inverno); ~8:00 in estate per via dell'ora legale
   workflow_dispatch:
 
 jobs:
   run-cardio-script:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4
@@ -18,8 +18,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install required libraries
-        run: |
-          pip install requests feedparser
+        run: pip install requests
 
       - name: Execute PubMed and Groq Agent
         env:
@@ -27,3 +26,10 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python ./cardio_agent.py
+
+      - name: Notifica fallimento
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d text="⚠️ Cardio agent fallito, controlla i log su GitHub Actions"
