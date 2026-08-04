@@ -38,7 +38,7 @@ def get_all_recent_articles():
     query = 'Eur Heart J[ta] OR Circulation[ta] OR J Am Coll Cardiol[ta] OR "G Ital Cardiol (Rome)"[ta]'
     params = {
         "db": "pubmed",
-       "term": f'{query} AND ("last 30 days"[PDat])',
+        "term": f'{query} AND ("last 30 days"[PDat])',
         "retmax": 15,
         "sort": "most recent",
         "retmode": "json",
@@ -100,7 +100,7 @@ If it is clinically relevant, provide a concise summary in ENGLISH formatted exa
 📝 *Key Findings:* (max 4 short lines)
 """
     data = {
-       "model": "openai/gpt-oss-20b",
+        "model": "openai/gpt-oss-20b",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.1,
     }
@@ -113,6 +113,39 @@ If it is clinically relevant, provide a concise summary in ENGLISH formatted exa
     except Exception as e:
         print(f"[Groq Exception] {e}")
         return "IGNORE"
+
+
+def summarize_no_filter(title, abstract, source):
+    """Come analyze_with_groq ma senza filtro di rilevanza: riassume sempre."""
+    if not GROQ_API_KEY:
+        return None
+
+    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
+    prompt = f"""
+Act as an expert cardiologist. Summarize this article for a fellow cardiologist, regardless of how groundbreaking it is:
+Source: {source}
+Title: {title}
+Abstract: {abstract[:1800]}
+
+Provide a concise summary in ENGLISH formatted exactly as follows:
+📄 **[ARTICLE TITLE IN ENGLISH]**
+🏛️ *Source:* {source}
+📝 *Summary:* (max 4 short lines)
+"""
+    data = {
+        "model": "openai/gpt-oss-20b",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.1,
+    }
+    try:
+        response = requests.post(GROQ_URL, json=data, headers=headers, timeout=25)
+        if response.status_code == 200:
+            return response.json()["choices"][0]["message"]["content"].strip()
+        print(f"[Groq Error - fallback] Codice HTTP {response.status_code}: {response.text[:200]}")
+        return None
+    except Exception as e:
+        print(f"[Groq Exception - fallback] {e}")
+        return None
 
 
 def send_to_telegram(message, link):
@@ -145,6 +178,9 @@ def main():
         print("Impossibile decodificare i dettagli degli articoli.")
         return
 
+    notifications_sent = 0
+    first_article = None  # per il fallback "paper of the day"
+
     for art in root.findall(".//PubmedArticle"):
         pmid = art.findtext(".//PMID", default="")
         title = art.findtext(".//ArticleTitle", default="").strip()
@@ -156,14 +192,30 @@ def main():
             continue
 
         source_detected = identify_source(raw_journal)
+
+        if first_article is None:
+            # Il primo articolo con abstract valido: lo teniamo da parte come possibile
+            # "paper of the day" nel caso nessun articolo superi il filtro di rilevanza.
+            first_article = {"pmid": pmid, "title": title, "abstract": abstract, "source": source_detected}
+
         analysis = analyze_with_groq(title, abstract, source_detected)
 
         if "IGNORE" not in analysis:
             send_to_telegram(analysis, f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/")
             print(f"Notifica inoltrata per PMID: {pmid}")
+            notifications_sent += 1
         else:
             print(f"Ignorato (non rilevante): PMID {pmid}")
         time.sleep(1)
+
+    # Fallback: se nessun articolo era abbastanza rilevante, riassumi comunque il più recente
+    if notifications_sent == 0 and first_article is not None:
+        print("Nessun articolo rilevante: invio il paper of the day come fallback.")
+        summary = summarize_no_filter(first_article["title"], first_article["abstract"], first_article["source"])
+        if summary:
+            header = "📌 *Nessun trial di rilievo oggi — ecco il paper of the day:*\n\n"
+            link = f"https://pubmed.ncbi.nlm.nih.gov/{first_article['pmid']}/"
+            send_to_telegram(header + summary, link)
 
     print("--- MONITORAGGIO COMPLETATO ---")
 
