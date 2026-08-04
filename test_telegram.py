@@ -1,5 +1,3 @@
-File 1 — test_telegram.py (root del repo) — deve contenere SOLO questo:
-python
 import os
 import requests
 
