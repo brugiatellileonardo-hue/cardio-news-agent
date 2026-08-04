@@ -100,7 +100,7 @@ If it is clinically relevant, provide a concise summary in ENGLISH formatted exa
 📝 *Key Findings:* (max 4 short lines)
 """
     data = {
-        "model": "llama3-8b-8192",
+       "model": "openai/gpt-oss-20b",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.1,
     }
