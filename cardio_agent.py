@@ -38,7 +38,7 @@ def get_all_recent_articles():
     query = 'Eur Heart J[ta] OR Circulation[ta] OR J Am Coll Cardiol[ta] OR "G Ital Cardiol (Rome)"[ta]'
     params = {
         "db": "pubmed",
-        "term": f"{query} AND (last 30 days[Filter])",
+       "term": f'{query} AND ("last 30 days"[PDat])',
         "retmax": 15,
         "sort": "most recent",
         "retmode": "json",
