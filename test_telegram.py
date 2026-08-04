@@ -1,19 +1,13 @@
-name: Test Telegram
-on:
-  workflow_dispatch:
+File 1 — test_telegram.py (root del repo) — deve contenere SOLO questo:
+python
+import os
+import requests
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Elenca i file del repo
-        run: find . -name "*.py"
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install requests
-      - run: python test_telegram.py
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+
+url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+r = requests.post(url, json={"chat_id": CHAT_ID, "text": "Test di connessione OK ✅"})
+
+print("Status:", r.status_code)
+print("Risposta:", r.text)
