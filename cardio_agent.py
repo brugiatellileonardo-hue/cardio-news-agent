@@ -85,6 +85,19 @@ def get_critical_care_articles():
     return _search_pubmed(query)
 
 
+def _get_with_retry(url, params, max_retries=3):
+    """GET con retry su HTTP 429 (rate limit NCBI), backoff crescente: 2s, 4s, 8s."""
+    for attempt in range(max_retries):
+        r = requests.get(url, params=params, headers=HTTP_HEADERS, timeout=20)
+        if r.status_code == 429:
+            wait = 2 * (attempt + 1)
+            print(f"[Rate limit] 429 ricevuto, riprovo tra {wait}s (tentativo {attempt + 1}/{max_retries})")
+            time.sleep(wait)
+            continue
+        return r
+    return r  # ultimo tentativo, anche se ancora 429
+
+
 def _search_pubmed(query, days=30, retmax=15):
     params = {
         "db": "pubmed",
@@ -94,12 +107,13 @@ def _search_pubmed(query, days=30, retmax=15):
         "retmode": "json",
     }
     try:
-        r = requests.get(PUBMED_ESEARCH, params=params, headers=HTTP_HEADERS, timeout=20)
+        r = _get_with_retry(PUBMED_ESEARCH, params)
         if r.status_code != 200:
             print(f"[PubMed Error] Codice HTTP {r.status_code}")
             return []
         id_list = r.json().get("esearchresult", {}).get("idlist", [])
         print(f"[PubMed] Trovati {len(id_list)} articoli per query: {query[:40]}...")
+        time.sleep(0.5)  # pausa tra una query esearch e la prossima
         return id_list
     except Exception as e:
         print(f"Errore recupero ID da PubMed: {e}")
@@ -111,7 +125,7 @@ def fetch_articles_xml(pmids):
         return None
     params = {"db": "pubmed", "id": ",".join(pmids), "rettype": "abstract", "retmode": "xml"}
     try:
-        resp = requests.get(PUBMED_EFETCH, params=params, headers=HTTP_HEADERS, timeout=20)
+        resp = _get_with_retry(PUBMED_EFETCH, params)
         if resp.status_code == 200:
             return ET.fromstring(resp.content)
         print(f"[PubMed EFetch Error] Codice HTTP {resp.status_code}")
