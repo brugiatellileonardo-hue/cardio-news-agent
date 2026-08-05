@@ -19,13 +19,19 @@ JOURNAL_NAMES = {
     "european heart journal": "European Heart Journal",
     "acute cardiovascular care": "EHJ Acute Cardiovascular Care",
     "preventive cardiology": "European Journal of Preventive Cardiology",
+    "heart failure & cardiomyopathies": "JACC: Heart Failure",  # va prima di "heart failure" generico
     "heart failure": "European Journal of Heart Failure",
     "europace": "Europace",
     "cardiovascular imaging": "EHJ Cardiovascular Imaging",
+    "cardiovascular interventions": "Cardiovascular Interventions (JACC/Circulation)",
+    "clinical electrophysiology": "JACC: Clinical Electrophysiology",
     "circulation": "Circulation",
     "american college of cardiology": "JACC / ACC",
     "jama cardiology": "JAMA Cardiology",
     "new england journal": "NEJM",
+    "nejm evidence": "NEJM Evidence",
+    "lancet": "The Lancet",
+    "resuscitation": "Resuscitation",
     "critical care": "Critical Care Reviews / ICU",
 }
 
@@ -35,26 +41,47 @@ PUBMED_EFETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 TELEGRAM_URL_TEMPLATE = "https://api.telegram.org/bot{token}/sendMessage"
 
+# ISSN delle sottoriviste JACC/Circulation aggiunte (verificati)
+JACC_CIRC_SUBJOURNAL_ISSNS = [
+    "2213-1779",  # JACC: Heart Failure
+    "1936-8798",  # JACC: Cardiovascular Interventions
+    "2405-500X",  # JACC: Clinical Electrophysiology
+    "1941-3289",  # Circulation: Heart Failure
+    "1941-7640",  # Circulation: Cardiovascular Interventions
+]
+
 
 def get_all_recent_articles():
+    issn_clause = " OR ".join(f'"{i}"[Journal]' for i in JACC_CIRC_SUBJOURNAL_ISSNS)
     query = (
         'Eur Heart J[ta] OR Circulation[ta] OR J Am Coll Cardiol[ta] '
-        'OR "G Ital Cardiol (Rome)"[ta] OR "JAMA Cardiol"[ta]'
+        'OR "G Ital Cardiol (Rome)"[ta] OR "JAMA Cardiol"[ta] '
+        f'OR {issn_clause}'
     )
     return _search_pubmed(query)
 
 
 def get_nejm_cardio_articles():
-    # NEJM non ha una sezione cardio indicizzata separatamente: filtriamo per parole chiave nel titolo/abstract
+    # NEJM non ha una sezione cardio indicizzata separatamente: filtriamo per parole chiave nel titolo/abstract.
+    # NEJM Evidence (ISSN 2766-5526) è inclusa con lo stesso filtro, per lo stesso motivo.
     query = (
-        '"N Engl J Med"[ta] AND (cardiovascular[tiab] OR cardiac[tiab] OR heart[tiab] '
+        '("N Engl J Med"[ta] OR "2766-5526"[Journal]) AND (cardiovascular[tiab] OR cardiac[tiab] OR heart[tiab] '
+        'OR coronary[tiab] OR myocardial[tiab] OR arrhythmia[tiab] OR "heart failure"[tiab])'
+    )
+    return _search_pubmed(query)
+
+
+def get_lancet_cardio_articles():
+    # Stesso approccio di NEJM: The Lancet copre tutta la medicina, filtriamo per cardiologia
+    query = (
+        'Lancet[ta] AND (cardiovascular[tiab] OR cardiac[tiab] OR heart[tiab] '
         'OR coronary[tiab] OR myocardial[tiab] OR arrhythmia[tiab] OR "heart failure"[tiab])'
     )
     return _search_pubmed(query)
 
 
 def get_critical_care_articles():
-    query = 'Crit Care Med[ta] OR Intensive Care Med[ta] OR "Crit Care"[ta]'
+    query = 'Crit Care Med[ta] OR Intensive Care Med[ta] OR "Crit Care"[ta] OR "0300-9572"[Journal]'
     return _search_pubmed(query)
 
 
@@ -126,7 +153,7 @@ If it is clinically relevant, write in ENGLISH, conversational tone, formatted e
     data = {
         "model": "openai/gpt-oss-20b",
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.1,
+        "temperature": 0.4,
     }
     try:
         response = requests.post(GROQ_URL, json=data, headers=headers, timeout=25)
@@ -160,7 +187,7 @@ Write in ENGLISH, conversational tone, formatted exactly as follows:
     data = {
         "model": "openai/gpt-oss-20b",
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.1,
+        "temperature": 0.4,
     }
     try:
         response = requests.post(GROQ_URL, json=data, headers=headers, timeout=25)
@@ -228,8 +255,12 @@ def process_articles(root, apply_filter):
 def main():
     print("--- AVVIO AGENTE CARDIO ---")
 
-    # --- Pool 1: cardiologia (incl. JAMA Cardiology), con filtro di rilevanza ---
-    ids = get_all_recent_articles() + get_nejm_cardio_articles()
+    # --- Pool 1: cardiologia (incl. JAMA Cardiology, sottoriviste JACC/Circulation, NEJM, NEJM Evidence, Lancet), con filtro di rilevanza ---
+    ids = (
+        get_all_recent_articles()
+        + get_nejm_cardio_articles()
+        + get_lancet_cardio_articles()
+    )
     if ids:
         root = fetch_articles_xml(ids)
         if root is not None:
