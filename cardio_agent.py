@@ -3,12 +3,35 @@ Agente news cardiologiche: PubMed -> Groq Llama3 (gratis) -> Telegram
 """
 import os
 import time
+import json
 import xml.etree.ElementTree as ET
 import requests
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+
+SENT_LOG_PATH = "sent_pmids.json"
+MAX_LOG_SIZE = 2000  # evita che il file cresca all'infinito nel tempo
+
+
+def load_sent_pmids():
+    if not os.path.exists(SENT_LOG_PATH):
+        return set()
+    try:
+        with open(SENT_LOG_PATH, "r") as f:
+            return set(json.load(f))
+    except Exception as e:
+        print(f"[Sent log] Errore lettura, riparto da vuoto: {e}")
+        return set()
+
+
+def save_sent_pmids(pmids_set):
+    # Teniamo solo gli ultimi MAX_LOG_SIZE per non far crescere il file all'infinito
+    trimmed = list(pmids_set)[-MAX_LOG_SIZE:]
+    with open(SENT_LOG_PATH, "w") as f:
+        json.dump(trimmed, f)
+
 
 HTTP_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -98,7 +121,7 @@ def _get_with_retry(url, params, max_retries=3):
     return r  # ultimo tentativo, anche se ancora 429
 
 
-def _search_pubmed(query, days=30, retmax=15):
+def _search_pubmed(query, days=3, retmax=15):
     params = {
         "db": "pubmed",
         "term": f'{query} AND ("last {days} days"[PDat])',
@@ -232,9 +255,10 @@ def send_to_telegram(message, link):
         print(f"[Telegram Exception] {e}")
 
 
-def process_articles(root, apply_filter):
-    """Estrae gli articoli dall'XML. Se apply_filter=True invia solo i rilevanti (filtro Groq).
-    Se apply_filter=False invia sempre un riassunto del primo articolo trovato (paper of the day)."""
+def process_articles(root, apply_filter, sent_pmids):
+    """Estrae gli articoli dall'XML, saltando quelli già inviati in precedenza (sent_pmids).
+    Se apply_filter=True invia solo i rilevanti (filtro Groq).
+    Se apply_filter=False invia sempre un riassunto del primo articolo NON ANCORA INVIATO (paper of the day)."""
     first_article = None
     notifications_sent = 0
 
@@ -242,6 +266,9 @@ def process_articles(root, apply_filter):
         pmid = art.findtext(".//PMID", default="")
         title = art.findtext(".//ArticleTitle", default="").strip()
         raw_journal = art.findtext(".//Journal/Title", default="Cardiology")
+
+        if pmid in sent_pmids:
+            continue  # già inviato in un'esecuzione precedente
 
         abstract_parts = ["".join(ab.itertext()).strip() for ab in art.findall(".//Abstract/AbstractText")]
         abstract = " ".join(abstract_parts).strip()
@@ -259,6 +286,7 @@ def process_articles(root, apply_filter):
                 send_to_telegram(analysis, f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/")
                 print(f"Notifica inoltrata per PMID: {pmid}")
                 notifications_sent += 1
+                sent_pmids.add(pmid)
             else:
                 print(f"Ignorato (non rilevante): PMID {pmid}")
             time.sleep(1)
@@ -268,6 +296,8 @@ def process_articles(root, apply_filter):
 
 def main():
     print("--- AVVIO AGENTE CARDIO ---")
+    sent_pmids = load_sent_pmids()
+    print(f"[Sent log] {len(sent_pmids)} PMID già inviati in precedenza.")
 
     # --- Pool 1: cardiologia (incl. JAMA Cardiology, sottoriviste JACC/Circulation, NEJM, NEJM Evidence, Lancet), con filtro di rilevanza ---
     ids = (
@@ -278,7 +308,7 @@ def main():
     if ids:
         root = fetch_articles_xml(ids)
         if root is not None:
-            first_cardio, notifications_sent = process_articles(root, apply_filter=True)
+            first_cardio, notifications_sent = process_articles(root, apply_filter=True, sent_pmids=sent_pmids)
             if notifications_sent == 0 and first_cardio is not None:
                 print("Nessun trial cardio rilevante: invio il paper of the day cardio come fallback.")
                 summary = summarize_no_filter(first_cardio["title"], first_cardio["abstract"], first_cardio["source"])
@@ -286,6 +316,7 @@ def main():
                     header = "📌 *Nessun trial cardio di rilievo oggi — paper of the day:*\n\n"
                     link = f"https://pubmed.ncbi.nlm.nih.gov/{first_cardio['pmid']}/"
                     send_to_telegram(header + summary, link)
+                    sent_pmids.add(first_cardio["pmid"])
         else:
             print("Impossibile decodificare i dettagli degli articoli cardio.")
     else:
@@ -296,7 +327,7 @@ def main():
     if cc_ids:
         cc_root = fetch_articles_xml(cc_ids)
         if cc_root is not None:
-            first_cc, _ = process_articles(cc_root, apply_filter=False)
+            first_cc, _ = process_articles(cc_root, apply_filter=False, sent_pmids=sent_pmids)
             if first_cc is not None:
                 summary = summarize_no_filter(first_cc["title"], first_cc["abstract"], "Critical Care Reviews")
                 if summary:
@@ -304,11 +335,13 @@ def main():
                     link = f"https://pubmed.ncbi.nlm.nih.gov/{first_cc['pmid']}/"
                     send_to_telegram(header + summary, link)
                     print(f"Paper of the day critical care inviato: PMID {first_cc['pmid']}")
+                    sent_pmids.add(first_cc["pmid"])
         else:
             print("Impossibile decodificare i dettagli degli articoli critical care.")
     else:
         print("Nessun articolo critical care trovato.")
 
+    save_sent_pmids(sent_pmids)
     print("--- MONITORAGGIO COMPLETATO ---")
 
 
