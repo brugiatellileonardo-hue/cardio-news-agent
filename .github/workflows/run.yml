@@ -8,6 +8,8 @@ jobs:
   run-cardio-script:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write   # necessario per ricommittare sent_pmids.json
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4
@@ -26,6 +28,14 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python ./cardio_agent.py
+
+      - name: Salva il registro degli articoli già inviati
+        run: |
+          git config user.name "cardio-news-bot"
+          git config user.email "actions@github.com"
+          git add sent_pmids.json
+          git diff --staged --quiet || git commit -m "Aggiorna registro articoli inviati [skip ci]"
+          git push
 
       - name: Notifica fallimento
         if: failure()
