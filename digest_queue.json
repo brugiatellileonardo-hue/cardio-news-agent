@@ -11,7 +11,8 @@
   "take_home": "In complex coronary interventions, routinely use IVUS/OCT guidance to improve procedural success and long‑term outcomes.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42878015",
@@ -25,7 +26,8 @@
   "take_home": "Use post‑PCI physiological assessment to guide optimization and reduce 12‑month adverse events.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42873164",
@@ -39,7 +41,8 @@
   "take_home": "Transseptal TMVR with the SAPIEN M3 offers durable MR relief and symptom benefit in selected MAC patients, but it carries a substantial risk of mortality, stroke, and valve complications.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42863873",
@@ -53,7 +56,8 @@
   "take_home": "Even though intraprocedural cardiac arrest is still rare, its mortality remains high, and recognizing the identified risk factors can guide us to tighten monitoring and early intervention during high-risk PCI.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42863871",
@@ -67,7 +71,8 @@
   "take_home": "In STEMI patients with multivessel disease, staged complete revascularization appears to reduce mortality compared with immediate intervention.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42863869",
@@ -81,7 +86,8 @@
   "take_home": "Use flow‑based OMI definitions to identify high‑risk ACS patients beyond ST‑elevation status and guide more aggressive therapy.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42863867",
@@ -95,7 +101,8 @@
   "take_home": "Using an occlusion-focused diagnostic approach may enable earlier invasive treatment and better detection of occlusion without lowering angiographic success.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42863865",
@@ -109,7 +116,8 @@
   "take_home": "NSTEMI patients with acute occlusion represent a high‑risk group that may benefit from earlier reperfusion to improve in‑hospital outcomes.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42880414",
@@ -123,7 +131,8 @@
   "take_home": "This technique offers a practical, high‑resolution way to quantify left‑atrial fibrosis at 1.5 T, potentially aiding patient selection for ablation.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42880413",
@@ -137,7 +146,8 @@
   "take_home": "In the first six months after pediatric heart transplant, diffuse T1/T2 elevations and transient diastolic impairment are expected; use graft‑age‑specific reference ranges to avoid mistaking these changes for rejection.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42876202",
@@ -151,7 +161,8 @@
   "take_home": "Future heart‑failure studies should enroll more women and analyze sex‑specific outcomes, as women may derive greater benefit from pharmacologic therapy.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42874802",
@@ -165,7 +176,8 @@
   "take_home": "When using 4D flow CMR in repaired TOF, standardize acquisition parameters and monitor aSNR, aVNR, and aliasing to ensure reliable hemodynamic biomarkers.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42874074",
@@ -179,7 +191,8 @@
   "take_home": "Elastic leg compression could be a low‑cost adjunct to improve diuretic response in ADHF, but randomized trials are needed to confirm benefit.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42870400",
@@ -193,7 +206,8 @@
   "take_home": "In aortic regurgitation, LGE extent >2.6% plus a subendocardial pattern identifies patients who need closer monitoring or earlier surgical consideration.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42867428",
@@ -207,7 +221,8 @@
   "take_home": "Use multimodality imaging and rhythm monitoring to risk‑stratify patients with mitral valve prolapse before any mitral intervention.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42867408",
@@ -221,7 +236,8 @@
   "take_home": "Accreditation seems to drive better guideline adherence, especially for HFrEF, but the mortality benefit remains uncertain.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42865104",
@@ -235,7 +251,8 @@
   "take_home": "Targeted primary‑care and digital outreach can efficiently identify high‑risk underserved patients, revealing a substantial hidden burden of CVD that could be addressed early to prevent heart failure.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42863763",
@@ -249,7 +266,8 @@
   "take_home": "This AI tool shows promise for rapid, accurate aneurysm detection on MRA, but has no direct impact on cardiac care.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42863762",
@@ -263,7 +281,8 @@
   "take_home": "LV entropy from CMR is a useful, independent prognostic marker in PAH that adds value to existing ESC risk scores.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42863457",
@@ -277,7 +296,8 @@
   "take_home": "Stopping anabolic steroids reverses LV remodeling and improves function; antihypertensives may benefit those who continue use.",
   "pool": "cardio",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42878614",
@@ -291,7 +311,8 @@
   "take_home": "Allowing families to visit more freely in the cardiac ICU can reduce delirium and ventilation time without harming other outcomes.",
   "pool": "critical care",
   "date": "2026-10-16",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42878613",
@@ -305,7 +326,8 @@
   "take_home": "Use the lab-based model when you have labs; otherwise the toxicity score can guide decisions in intoxicated ICU patients.",
   "pool": "critical care",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42878611",
@@ -319,7 +341,8 @@
   "take_home": "Tele‑critical care modestly increases transfer rates but improves early post‑transfer outcomes, suggesting better transfer selection for critically ill patients.",
   "pool": "critical care",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42878609",
@@ -333,7 +356,8 @@
   "take_home": "In neuro‑ICU patients, using lower tidal volumes and driving pressures may reduce ARDS risk, yet these patients still face higher ARDS rates but better survival than non‑neuro‑ICU patients.",
   "pool": "critical care",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42872941",
@@ -347,7 +371,8 @@
   "take_home": "Consider revising pediatric CPR ventilation targets, particularly for children under 8, as higher rates may improve survival.",
   "pool": "critical care",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42872921",
@@ -361,7 +386,8 @@
   "take_home": "Consider adopting lower oliguria thresholds to flag kidney injury earlier and potentially improve ICU care.",
   "pool": "critical care",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42872916",
@@ -375,7 +401,8 @@
   "take_home": "Treating patients’ mental post‑ICU symptoms may also help protect caregivers’ mental health.",
   "pool": "critical care",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42864673",
@@ -389,7 +416,8 @@
   "take_home": "HFNC may benefit older or higher‑risk patients after lung resection, but routine prophylactic use for all patients is not warranted.",
   "pool": "critical care",
   "date": "2026-10-16",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42886095",
@@ -403,7 +431,8 @@
   "take_home": "Using ablation quality metrics in a ML framework gives a reliable tool to forecast AF recurrence and could inform intraprocedural decisions.",
   "pool": "cardio",
   "date": "2026-10-17",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42886087",
@@ -417,7 +446,8 @@
   "take_home": "Interatrial shunting is durable and safe in HFrEF but should be avoided in HFpEF due to higher adverse events.",
   "pool": "cardio",
   "date": "2026-10-17",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42886083",
@@ -431,7 +461,8 @@
   "take_home": "Occupational and geographic factors drive cardiovascular risk—targeted prevention could reduce burden in high‑risk groups.",
   "pool": "cardio",
   "date": "2026-10-17",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42888168",
@@ -445,7 +476,8 @@
   "take_home": "Radiotherapy can modify sodium channel activity and conduction, potentially suppressing VT but also risking arrhythmia and contractile dysfunction.",
   "pool": "cardio",
   "date": "2026-10-17",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42887781",
@@ -459,7 +491,8 @@
   "take_home": "In short, COVID‑19 doesn’t appear to cause worse myocardial inflammation than other viral respiratory illnesses, so we can be less alarmed about long‑term cardiac sequelae in recovered patients.",
   "pool": "cardio",
   "date": "2026-10-17",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42886864",
@@ -473,7 +506,8 @@
   "take_home": "Consider GLP‑1 agonists as a potential strategy to improve long‑term outcomes after AVR.",
   "pool": "cardio",
   "date": "2026-10-17",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42886154",
@@ -487,7 +521,8 @@
   "take_home": "Statins not only lower LDL‑C but also shift plaque toward a denser, more stable phenotype in asymptomatic, intermediate‑risk patients.",
   "pool": "cardio",
   "date": "2026-10-17",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42886153",
@@ -501,7 +536,8 @@
   "take_home": "A few key ASE signs are highly specific for severe MR, so you can often skip extensive quantification and still diagnose accurately.",
   "pool": "cardio",
   "date": "2026-10-17",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42885833",
@@ -515,7 +551,8 @@
   "take_home": "In patients over 40 with unexplained syncope, perform both carotid sinus massage and tilt testing because the two conditions frequently coexist and can unmask a cardioinhibitory reflex.",
   "pool": "cardio",
   "date": "2026-10-17",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42885993",
@@ -529,7 +566,8 @@
   "take_home": "Family satisfaction surveys can be implemented widely, but engagement remains low; improving activation and completion is key to meaningful data.",
   "pool": "critical care",
   "date": "2026-10-17",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42885980",
@@ -543,7 +581,8 @@
   "take_home": "Improving ICU physical design can enhance the quality of family‑clinician communication during critical care discussions.",
   "pool": "critical care",
   "date": "2026-10-17",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42888496",
@@ -557,7 +596,8 @@
   "take_home": "Use ≤300 ng/L to confidently rule out acute heart failure in the ED, and apply age‑dependent thresholds to improve diagnostic accuracy when you need to rule in the disease.",
   "pool": "cardio",
   "date": "2026-10-18",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42886152",
@@ -571,6 +611,7 @@
   "take_home": "Use AI‑ECG to screen for high LV filling pressures and prognosticate outcomes, especially when invasive hemodynamics are not feasible.",
   "pool": "cardio",
   "date": "2026-10-18",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  }
 ]
