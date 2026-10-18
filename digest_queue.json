@@ -544,5 +544,33 @@
   "pool": "critical care",
   "date": "2026-10-17",
   "sent_daily": false
+ },
+ {
+  "pmid": "42888496",
+  "title": "Diagnostic Accuracy of NT-proBNP thresholds in Dyspneic Patients in the Emergency Department according to patients' characteristics: A Systematic Review and Meta-Analysis.",
+  "source": "Eur J Heart Fail",
+  "score": 3,
+  "type": "meta-analysis",
+  "topic": "heart failure",
+  "why": "In the ED, deciding whether a dyspneic patient has acute heart failure can change management, and NT‑proBNP thresholds are the main tool we use.",
+  "findings": "A single cut‑off of ≤300 ng/L rules out AHF with >97 % sensitivity and a 97 % NPV, but its specificity is only 46 %. Age‑adjusted cut‑offs (≥450, ≥900, ≥1800 ng/L for <50, 50‑75, ≥75 yrs) raise specificity to 82 % while keeping sensitivity around 86 % (AUC 0.84). In CKD and obesity the performance drops somewhat, but age‑adjusted thresholds still perform better than a fixed cut‑off.",
+  "take_home": "Use ≤300 ng/L to confidently rule out acute heart failure in the ED, and apply age‑dependent thresholds to improve diagnostic accuracy when you need to rule in the disease.",
+  "pool": "cardio",
+  "date": "2026-10-18",
+  "sent_daily": true
+ },
+ {
+  "pmid": "42886152",
+  "title": "Left Ventricular Filling Pressure Classification by Electrocardiogram, Echocardiography, and Catheterization: Prognostic Implications.",
+  "source": "JACC Cardiovasc Imaging",
+  "score": 3,
+  "type": "observational",
+  "topic": "imaging",
+  "why": "It shows that an AI‑enabled ECG can flag high filling pressures and predict death better than the gold‑standard catheter measurement, so you can risk‑stratify patients non‑invasively.",
+  "findings": "In 4,168 patients, AI‑ECG identified elevated LVFP in 2,383, echo in 1,643, PAWP in 1,841. AI‑ECG had an AUC of 0.88 against echo and 0.71 against PAWP. Over 7.7 years, AI‑ECG‑positive patients had a 1.8‑fold higher mortality risk, echo 1.7‑fold, PAWP only 1.2‑fold.",
+  "take_home": "Use AI‑ECG to screen for high LV filling pressures and prognosticate outcomes, especially when invasive hemodynamics are not feasible.",
+  "pool": "cardio",
+  "date": "2026-10-18",
+  "sent_daily": false
  }
 ]
