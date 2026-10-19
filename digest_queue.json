@@ -613,5 +613,19 @@
   "date": "2026-10-18",
   "sent_daily": false,
   "digested": true
+ },
+ {
+  "pmid": "42893745",
+  "title": "Multi-center study of CMR versus cardiac catheterization with endomyocardial biopsy for pediatric transplant surveillance: study protocol.",
+  "source": "J Cardiovasc Magn Reson",
+  "score": 2,
+  "type": "protocol",
+  "topic": "imaging",
+  "why": "It could change how we monitor rejection in kids, cutting down on painful biopsies.",
+  "findings": "This paper just describes the design of a multicenter trial that will compare CMR and blood biomarkers to the current gold‑standard EMB. No data yet.",
+  "take_home": "Once completed, the study may give us a non‑invasive way to spot rejection early and spare patients the biopsy.",
+  "pool": "cardio",
+  "date": "2026-10-19",
+  "sent_daily": true
  }
 ]
