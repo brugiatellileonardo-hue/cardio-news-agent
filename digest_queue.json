@@ -1551,5 +1551,47 @@
   "pool": "critical care",
   "date": "2026-10-24",
   "sent_daily": false
+ },
+ {
+  "pmid": "42925297",
+  "title": "Immediate Complete Revascularization During Index Admission in Older Patients With ST-Segment Elevation Myocardial Infarction.",
+  "source": "JACC Cardiovasc Interv",
+  "score": 2,
+  "type": "other",
+  "topic": "coronary",
+  "why": "Older STEMI patients with multivessel disease might fare worse if you rush to complete revascularization during the same admission.",
+  "findings": "In patients 70 and older, immediate complete revascularization led to a higher rate of death, MI or revascularization compared with staged procedures. In younger patients the two strategies performed similarly.",
+  "take_home": "For patients over 70 with STEMI and multivessel disease, consider staging the non‑culprit artery PCI rather than doing it immediately.",
+  "pool": "cardio",
+  "date": "2026-10-25",
+  "sent_daily": false
+ },
+ {
+  "pmid": "42926135",
+  "title": "Earlier Versus Later Extracorporeal Cardiopulmonary Resuscitation in Refractory Out-of-Hospital Cardiac Arrest: A Nationwide Sequential Landmark Target Trial Emulation.",
+  "source": "Eur Heart J Acute Cardiovasc Care",
+  "score": 3,
+  "type": "observational",
+  "topic": "shock/MCS",
+  "why": "ECPR timing matters for refractory OHCA survival, and early initiation improves outcomes even beyond 60 minutes.",
+  "findings": "In a Korean nationwide registry, patients who received ECPR within 15 minutes had 31% 30‑day survival versus 16% without ECPR; at 30 minutes survival was 21.6% vs 7.2%; even at 60 minutes survival was 10.9% vs 3.2%. Neurological outcomes followed the same trend.",
+  "take_home": "Start ECPR as early as possible in refractory OHCA; the 60‑minute cutoff may be too conservative.",
+  "pool": "cardio",
+  "date": "2026-10-25",
+  "sent_daily": true
+ },
+ {
+  "pmid": "42925135",
+  "title": "Role of Mitochondrial Impairment in Sepsis-Induced Platelet Activation.",
+  "source": "Crit Care Med",
+  "score": 2,
+  "type": "other",
+  "topic": "acute/ICU",
+  "why": "Sepsis can trigger platelet hyperactivation that worsens organ injury—something we see in ICU patients—so understanding mitochondrial links is useful.",
+  "findings": "Septic plasma impairs platelet mitochondrial respiration and Complex I activity, boosting platelet activation; the mitochondria‑targeted antioxidant MitoTEMPO reverses these changes in vitro.",
+  "take_home": "Targeting platelet mitochondria with antioxidants like MitoTEMPO could blunt sepsis‑related platelet dysfunction and organ damage.",
+  "pool": "critical care",
+  "date": "2026-10-25",
+  "sent_daily": true
  }
 ]
