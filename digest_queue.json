@@ -626,7 +626,8 @@
   "take_home": "Once completed, the study may give us a non‑invasive way to spot rejection early and spare patients the biopsy.",
   "pool": "cardio",
   "date": "2026-10-19",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42895999",
@@ -640,7 +641,8 @@
   "take_home": "In patients who have had thoracic radiotherapy, consider RACAD as a likely culprit for coronary symptoms and integrate cancer‑specific factors into CAD care and surveillance.",
   "pool": "cardio",
   "date": "2026-10-20",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42895022",
@@ -654,7 +656,8 @@
   "take_home": "Early recognition of PPA2 deficiency and implementation of specific emergency protocols can reduce mortality in this high‑risk population.",
   "pool": "cardio",
   "date": "2026-10-20",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42895021",
@@ -668,7 +671,8 @@
   "take_home": "Harmonizing biobank data collection will boost the quality and impact of cardiovascular research, paving the way for new therapies.",
   "pool": "cardio",
   "date": "2026-10-20",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42895015",
@@ -682,7 +686,8 @@
   "take_home": "Implement bedside high‑sensitivity troponin in the ED to safely shorten stays by nearly an hour, improving throughput without compromising patient safety.",
   "pool": "cardio",
   "date": "2026-10-20",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42895002",
@@ -696,7 +701,8 @@
   "take_home": "Offering structured genetic counseling to patients with inherited cardiomyopathies or channelopathies improves their psychological well‑being and may support better clinical engagement.",
   "pool": "cardio",
   "date": "2026-10-20",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42896791",
@@ -710,7 +716,8 @@
   "take_home": "iT2prep‑IR BOOST shows promise as a rapid, non‑contrast alternative to LGE for MI and MVO assessment, but larger studies are needed to confirm its clinical utility.",
   "pool": "cardio",
   "date": "2026-10-20",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42895118",
@@ -724,7 +731,8 @@
   "take_home": "Non‑transplant cardiologists should adopt this structured framework to safely manage HTx patients and coordinate timely referrals to transplant centers.",
   "pool": "cardio",
   "date": "2026-10-20",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42897566",
@@ -738,7 +746,8 @@
   "take_home": "Keeping decision loads balanced and avoiding long, flat stretches may help ICU clinicians stay mentally sharp and improve care quality.",
   "pool": "critical care",
   "date": "2026-10-20",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42895439",
@@ -752,7 +761,8 @@
   "take_home": "In the ICU, immunosuppression—particularly hematologic malignancies—significantly raises infection risk, highlighting the importance of aggressive infection prevention in these patients.",
   "pool": "critical care",
   "date": "2026-10-20",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42900708",
@@ -766,7 +776,8 @@
   "take_home": "Adding a drug‑coated balloon to the side branch after main‑vessel stenting cuts restenosis without increasing 12‑month MACE.",
   "pool": "cardio",
   "date": "2026-10-21",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42900678",
@@ -780,7 +791,8 @@
   "take_home": "Early statin therapy may help preserve thymic output in FH, underscoring the broader benefits of lipid lowering beyond plaque regression.",
   "pool": "cardio",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42900029",
@@ -794,7 +806,8 @@
   "take_home": "Most IVF survivors have low mortality but a high, persistent recurrence risk that can be mitigated by identifying the underlying cause and using targeted drugs or ablation.",
   "pool": "cardio",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42899353",
@@ -808,7 +821,8 @@
   "take_home": "Use automated 3‑D CT body‑composition analysis to improve mortality risk stratification in TAVR candidates.",
   "pool": "cardio",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42899351",
@@ -822,7 +836,8 @@
   "take_home": "This atlas lets us translate KCNQ1 genetic findings into real‑world arrhythmia risk, sharpening precision medicine for long‑QT patients.",
   "pool": "cardio",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42901385",
@@ -836,7 +851,8 @@
   "take_home": "In DCM and isolated LV dilatation, LGE extent, distribution, and septal location are strong, independent predictors of death and should be factored into risk stratification.",
   "pool": "cardio",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42900033",
@@ -850,7 +866,8 @@
   "take_home": "Plaque‑free perivascular fat density appears to be the most reliable imaging biomarker for detecting and monitoring coronary plaque progression.",
   "pool": "cardio",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42900032",
@@ -864,7 +881,8 @@
   "take_home": "Measure EMW in MVP patients; a negative value beyond -30 ms flags those at high arrhythmic risk and may guide closer monitoring or early intervention.",
   "pool": "cardio",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42902313",
@@ -878,7 +896,8 @@
   "take_home": "Post-discharge follow-up and support should be intensified for elderly ICU survivors from regional or remote areas to improve long-term outcomes.",
   "pool": "critical care",
   "date": "2026-10-21",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42902295",
@@ -892,7 +911,8 @@
   "take_home": "Assess inspiratory muscle strength selectively in patients ventilated long‑term to better predict extubation success.",
   "pool": "critical care",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42901371",
@@ -906,7 +926,8 @@
   "take_home": "Screen for and address fatigue, anxiety and depression in OHCA survivors to improve long‑term recovery.",
   "pool": "critical care",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42901370",
@@ -920,7 +941,8 @@
   "take_home": "Video‑guided prehospital ALS boosts early ROSC but doesn’t change ultimate survival or brain outcomes, so its benefit for ICU care is limited.",
   "pool": "critical care",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42901369",
@@ -934,7 +956,8 @@
   "take_home": "Aim for pulse checks under 5 seconds during CPR to enhance capnographic dynamics and improve ROSC rates.",
   "pool": "critical care",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42901368",
@@ -948,7 +971,8 @@
   "take_home": "Aim to finish pad‑application in ≤50 s to hit the 60‑s shock‑delivery goal.",
   "pool": "critical care",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42901367",
@@ -962,7 +986,8 @@
   "take_home": "Recognizing BSIB on EEG may help identify patients with a specific cerebral oxygenation profile after cardiac arrest, guiding targeted monitoring.",
   "pool": "critical care",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42901366",
@@ -976,7 +1001,8 @@
   "take_home": "Real‑time feedback can tighten ventilation quality during CPR, but its impact on patient outcomes still needs confirmation.",
   "pool": "critical care",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42900697",
@@ -990,7 +1016,8 @@
   "take_home": "Watch tidal volume in NIV—elevated Vt/PBW signals higher risk of failure and worse outcomes, so consider tighter Vt control",
   "pool": "critical care",
   "date": "2026-10-21",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42906949",
@@ -1004,7 +1031,8 @@
   "take_home": "Rapid phenotype‑based triage and early evidence‑based interventions in the ED can improve outcomes, but pragmatic trials are needed to refine prehospital and biomarker‑guided strategies.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42905689",
@@ -1018,7 +1046,8 @@
   "take_home": "Nicotine vaping in young adults is associated with early vascular and fitness impairments, hinting at a potential long‑term cardiovascular risk.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42906855",
@@ -1032,7 +1061,8 @@
   "take_home": "In cardio‑oncology, CMR should be routinely used to detect subclinical cardiac injury and guide therapy decisions.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905917",
@@ -1046,7 +1076,8 @@
   "take_home": "PFA offers a promising, tissue‑selective ablation with minimal nerve damage, but careful dose titration and awareness of conduction system proximity remain essential.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905916",
@@ -1060,7 +1091,8 @@
   "take_home": "Use PFA for arrhythmia ablation, but keep an eye on coronary anatomy, hydration, and device proximity to avoid vasospasm, haemolysis, and interference.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905915",
@@ -1074,7 +1106,8 @@
   "take_home": "PFA shows promise as a safer, efficient arrhythmia ablation tool, but its success hinges on optimized waveforms, catheter design, and rigorous safety protocols.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905914",
@@ -1088,7 +1121,8 @@
   "take_home": "PFA offers a promising, non‑thermal alternative for arrhythmia ablation, but more cardiomyocyte‑specific data are needed to optimize its safety and durability.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905913",
@@ -1102,7 +1136,8 @@
   "take_home": "PFA offers comparable efficacy to thermal ablation but with fewer complications and a more patient‑friendly recovery, making it a compelling option for AF ablation.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905912",
@@ -1116,7 +1151,8 @@
   "take_home": "Until we have reliable real‑time markers, we’ll keep relying on standardized energy protocols and good catheter positioning, while watching for emerging imaging and mapping tools that could make PFA more reproducible.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905911",
@@ -1130,7 +1166,8 @@
   "take_home": "Choose the sedation depth and anaesthesia type based on patient risk, procedural complexity and device characteristics, aiming for the lightest effective approach.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905910",
@@ -1144,7 +1181,8 @@
   "take_home": "PFA looks promising beyond pulmonary vein isolation, but we need better endpoint definitions and durability data before it becomes a routine choice.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905909",
@@ -1158,7 +1196,8 @@
   "take_home": "PFA‑LAAC may be an option for carefully selected patients, but it’s not yet a routine strategy and needs prospective trials to confirm benefit.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42905523",
@@ -1172,7 +1211,8 @@
   "take_home": "Apply the BrS risk score at the time of ICD implantation to better identify patients who will benefit from the device.",
   "pool": "cardio",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42904954",
@@ -1186,7 +1226,8 @@
   "take_home": "Even with growing LMIC and female participation, significant inequities in authorship and journal impact remain—highlighting the need for more inclusive, collaborative research efforts.",
   "pool": "critical care",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42904944",
@@ -1200,7 +1241,8 @@
   "take_home": "When reviewing ICU meta‑analyses, check whether cluster‑RCTs are mixed in, as they may underestimate treatment effects on time‑based outcomes.",
   "pool": "critical care",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42904937",
@@ -1214,7 +1256,8 @@
   "take_home": "Use the FST to risk‑stratify AKI in ICU patients, but expect limited impact on survival.",
   "pool": "critical care",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42904906",
@@ -1228,7 +1271,8 @@
   "take_home": "Get the right antifungal in the first hours of hypotension—every hour matters for survival.",
   "pool": "critical care",
   "date": "2026-10-23",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42904879",
@@ -1242,7 +1286,8 @@
   "take_home": "Music therapy during ICU weaning may reduce agitation, sedation needs, and tracheostomy rates, but it does not shorten weaning or ICU stay.",
   "pool": "critical care",
   "date": "2026-10-23",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42912409",
@@ -1256,7 +1301,8 @@
   "take_home": "Tailor prevention to sex: cut tobacco/alcohol in men, tackle obesity and inactivity in women, and aggressively manage hypertensive disorders during pregnancy.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42912400",
@@ -1270,7 +1316,8 @@
   "take_home": "A CAC score above 90% in a 30‑45‑year‑old flags a markedly higher long‑term risk, so consider aggressive prevention even in this age group.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42911160",
@@ -1284,7 +1331,8 @@
   "take_home": "If the S‑QRS/EGM‑QRS gap exceeds 26 ms, suspect an intramural origin and pursue further mapping before giving up on the initial site.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42911157",
@@ -1298,7 +1346,8 @@
   "take_home": "Even with long dwell times and calcification, TLE of these leads is safe and successful at experienced centers.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42911156",
@@ -1312,7 +1361,8 @@
   "take_home": "Targeting the vein of Marshall during pulmonary vein isolation may reduce the chance of recurrent atrial tachycardia.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42911155",
@@ -1326,7 +1376,8 @@
   "take_home": "Adding LAAA to LAAC may reduce leaks without extra risk.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42911149",
@@ -1340,7 +1391,8 @@
   "take_home": "No results yet—results expected in 2027, so keep an eye out for whether bromocriptine truly boosts recovery in PPCM.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42910416",
@@ -1354,7 +1406,8 @@
   "take_home": "Successful aortic surgery hinges on clear multidisciplinary communication and shared protocols.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42909452",
@@ -1368,7 +1421,8 @@
   "take_home": "Sirolimus-coated balloons may lower revascularization and limb complications in femoropopliteal disease, but the data are descriptive and not practice‑changing.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42909432",
@@ -1382,7 +1436,8 @@
   "take_home": "CSP ICD leads for CRT provide safe, effective pacing with superior LV remodeling and clinical response compared to traditional BiV‑CRT.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42909430",
@@ -1396,7 +1451,8 @@
   "take_home": "In advanced heart failure, liver disease is frequent and may improve with cardiac support, yet we lack reliable tools to assess severity or predict outcomes.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42909429",
@@ -1410,7 +1466,8 @@
   "take_home": "Preeclampsia leaves a lasting, subclinical myocardial scar that can persist for a decade—early, routine echo screening may catch it before overt heart failure develops.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42909422",
@@ -1424,7 +1481,8 @@
   "take_home": "OFDI can guide DCB treatment in selected femoropopliteal lesions, but calcified nodules raise the restenosis risk.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42918425",
@@ -1438,7 +1496,8 @@
   "take_home": "Oxygenation-sensitive CMR and entropy mapping could serve as noninvasive early markers of myocardial involvement in depressed patients, but their clinical utility in acute cardiac care remains to be established.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42913094",
@@ -1452,7 +1511,8 @@
   "take_home": "A promising, blood‑contact‑free biventricular MCS that is safe and hemodynamically beneficial in a small cohort, but larger trials are needed to confirm its role.",
   "pool": "cardio",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42919460",
@@ -1466,7 +1526,8 @@
   "take_home": "Consider incorporating ARDS-CXR scores into ICU triage to spot high‑risk patients early.",
   "pool": "critical care",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42919451",
@@ -1480,7 +1541,8 @@
   "take_home": "A significant brachial‑radial pressure gradient is common in vasopressor‑treated ICU patients and signals greater illness severity and higher mortality—monitor it and consider it when titrating vasoactive therapy.",
   "pool": "critical care",
   "date": "2026-10-24",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42919448",
@@ -1494,7 +1556,8 @@
   "take_home": "Aim for first‑pass intubation with video laryngoscopy and agents like ketamine or propofol to keep TI‑CA rates low.",
   "pool": "critical care",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42919415",
@@ -1508,7 +1571,8 @@
   "take_home": "Use a validated score such as Thakar 2005 to flag high‑risk patients and apply early preventive strategies to reduce dialysis‑requiring AKI.",
   "pool": "critical care",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42919407",
@@ -1522,7 +1586,8 @@
   "take_home": "Early PCR‑based diagnosis, adequate amphotericin dosing, and immune monitoring—potentially with interferon‑gamma—may reduce mortality in ICU patients with mucormycosis.",
   "pool": "critical care",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42918318",
@@ -1536,7 +1601,8 @@
   "take_home": "Using an earlobe probe may speed initial signal acquisition in delivery rooms, but it does not improve the speed of obtaining a reliable reading once the probe is on.",
   "pool": "critical care",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42911397",
@@ -1550,7 +1616,8 @@
   "take_home": "In obese ICU patients, tailor drug doses based on weight and PK considerations, and involve a pharmacist whenever possible.",
   "pool": "critical care",
   "date": "2026-10-24",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42925297",
@@ -1564,7 +1631,8 @@
   "take_home": "For patients over 70 with STEMI and multivessel disease, consider staging the non‑culprit artery PCI rather than doing it immediately.",
   "pool": "cardio",
   "date": "2026-10-25",
-  "sent_daily": false
+  "sent_daily": false,
+  "digested": true
  },
  {
   "pmid": "42926135",
@@ -1578,7 +1646,8 @@
   "take_home": "Start ECPR as early as possible in refractory OHCA; the 60‑minute cutoff may be too conservative.",
   "pool": "cardio",
   "date": "2026-10-25",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  },
  {
   "pmid": "42925135",
@@ -1592,6 +1661,7 @@
   "take_home": "Targeting platelet mitochondria with antioxidants like MitoTEMPO could blunt sepsis‑related platelet dysfunction and organ damage.",
   "pool": "critical care",
   "date": "2026-10-25",
-  "sent_daily": true
+  "sent_daily": true,
+  "digested": true
  }
 ]
