@@ -1663,5 +1663,19 @@
   "date": "2026-10-25",
   "sent_daily": true,
   "digested": true
+ },
+ {
+  "pmid": "42928302",
+  "title": "Consensus recommendations for patient selection and clinical implementation of polymyxin B hemoadsorption in endotoxic septic shock.",
+  "source": "Crit Care",
+  "score": 2,
+  "type": "consensus",
+  "topic": "acute/ICU",
+  "why": "It gives a step‑by‑step protocol for using PMX‑HA in septic shock, which can affect cardiac function and ICU workflow.",
+  "findings": "The panel set criteria for when to test endotoxin, defined EAA thresholds (≥0.60 and <0.90) for considering therapy, recommended starting PMX‑HA within 36 h of shock onset, and a two‑session protocol 24 h apart, each 120 min.",
+  "take_home": "Follow the consensus framework to identify and treat eligible septic shock patients early with PMX‑HA, using the defined EAA cut‑offs and a 24‑h apart, 120‑min protocol.",
+  "pool": "critical care",
+  "date": "2026-10-26",
+  "sent_daily": true
  }
 ]
